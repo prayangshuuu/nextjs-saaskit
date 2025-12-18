@@ -230,6 +230,51 @@ If you do not have full repository context (e.g., you're reading only the README
 - **Email Templates**: Manage and customize email templates
 - **Settings Management**: System-wide configuration
 - **Audit Logs**: Complete audit trail of all system actions
+- **Module Management**: Enable/disable system features without redeployment
+
+### Module-Based Architecture
+
+**Philosophy**: Every feature, page, and system capability is controlled by a **module**. Admins can enable or disable modules from the Admin Dashboard, and changes apply instantly without code deployment.
+
+**Module System**:
+- **Database-Driven**: Module state is stored in the `system_modules` table
+- **Centralized Control**: Single source of truth for feature availability
+- **Multi-Level Enforcement**: Modules are checked at:
+  - **Middleware Level**: Blocks API routes and pages before execution
+  - **API Level**: Additional checks in route handlers
+  - **UI Level**: Components conditionally render based on module state
+
+**Default Modules**:
+- `landing` - Landing page (PUBLIC scope)
+- `pricing` - Pricing page and plans (PUBLIC scope)
+- `billing` - Billing and subscriptions (AUTH scope)
+- `auth` - Authentication system (PUBLIC scope)
+- `rest_api` - REST API access (AUTH scope)
+- `api_docs` - API documentation (PUBLIC scope)
+- `dashboard` - User dashboard (AUTH scope)
+- `admin` - Admin dashboard (ADMIN scope)
+- `file_uploads` - File upload system (AUTH scope)
+- `notifications` - Notification system (AUTH scope)
+
+**Module Scopes**:
+- **GLOBAL**: Available to everyone, no restrictions
+- **PUBLIC**: Available to unauthenticated users
+- **AUTH**: Requires authentication
+- **ADMIN**: Requires admin role
+
+**Dependency Rules**:
+- Cannot disable `admin` module (critical system module)
+- Cannot disable `auth` if `dashboard` is enabled
+- Cannot disable `rest_api` if `api_docs` is enabled
+- Cannot disable `dashboard` while users exist
+
+**How Modules Affect System Behavior**:
+- **Disabled API Routes**: Return 404 or 403 errors
+- **Disabled Pages**: Redirect to appropriate fallback pages
+- **Disabled UI Components**: Hidden or disabled
+- **Changes Apply Instantly**: No code deployment required
+
+**Admin Control**: Access module management at `/dashboard/admin/modules` (admin only)
 
 ### Database
 - **Prisma**: Type-safe database client
