@@ -205,6 +205,27 @@ A production-ready SaaS starter kit built with Next.js, featuring authentication
 - `api_keys.organizationId` - Links API keys to organizations
 - Prisma middleware automatically enforces tenant isolation for all queries
 
+#### `smtp_configs`
+- `id` (String, Primary Key)
+- `organizationId` (String, Optional, Foreign Key → organizations) - null for global fallback
+- `host` (String) - SMTP server hostname
+- `port` (Int) - SMTP port (default: 587)
+- `username` (String) - SMTP username
+- `password` (String) - Encrypted SMTP password
+- `fromName` (String) - Sender display name
+- `fromEmail` (String) - Sender email address
+- `secure` (Boolean) - Use TLS/SSL (default: false)
+- `enabled` (Boolean) - Whether config is active
+- `createdAt`, `updatedAt` (DateTime)
+- Unique constraint on `organizationId` (one config per org)
+
+**Email Architecture:**
+- Global SMTP fallback (organizationId = null)
+- Organization-level SMTP override support
+- Automatic fallback: org config → global config
+- Encrypted password storage (application layer)
+- Provider-agnostic email service
+
 ## 🔌 API Structure
 
 All API routes are versioned under `/api/v1`.
