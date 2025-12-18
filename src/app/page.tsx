@@ -2,6 +2,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, ArrowRight, Zap, Shield, Globe, BarChart3 } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "SaaS Kit - Build Your SaaS Faster",
+  description: "Production-ready SaaS starter kit with authentication, billing, multi-tenancy, and everything you need to launch.",
+  keywords: ["SaaS", "starter kit", "Next.js", "TypeScript", "multi-tenant"],
+};
 
 export default function HomePage() {
   return (
