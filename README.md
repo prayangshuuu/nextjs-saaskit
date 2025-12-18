@@ -294,6 +294,59 @@ Reset password with token.
 }
 ```
 
+### Admin Endpoints
+
+#### `GET /api/v1/admin/plans`
+Get all subscription plans (Admin only).
+
+**Response:**
+```json
+{
+  "plans": [
+    {
+      "id": "plan_id",
+      "name": "Pro Plan",
+      "description": "Professional features",
+      "price": 29.99,
+      "interval": "MONTHLY",
+      "features": ["Feature 1", "Feature 2"],
+      "active": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}
+```
+
+#### `POST /api/v1/admin/plans`
+Create a new subscription plan (Admin only).
+
+**Request Body:**
+```json
+{
+  "name": "Pro Plan",
+  "description": "Professional features",
+  "price": 29.99,
+  "interval": "MONTHLY",
+  "features": ["Feature 1", "Feature 2"],
+  "active": true
+}
+```
+
+#### `PUT /api/v1/admin/plans/:id`
+Update a subscription plan (Admin only).
+
+**Request Body:** (all fields optional)
+```json
+{
+  "name": "Updated Plan",
+  "price": 39.99,
+  "active": false
+}
+```
+
+#### `DELETE /api/v1/admin/plans/:id`
+Delete a subscription plan (Admin only). Cannot delete plans with active subscriptions.
+
 ## 👥 Admin vs User Capabilities
 
 ### Admin Capabilities
@@ -301,6 +354,10 @@ Reset password with token.
 - All permissions granted automatically
 - Access to admin-only routes (`/api/v1/admin/*`)
 - User management
+- **Plans Management**: Create, update, delete subscription plans
+  - Manage plan pricing, intervals (monthly/yearly)
+  - Configure plan features
+  - Toggle plan active/inactive status
 - System configuration
 - All CRUD operations
 
