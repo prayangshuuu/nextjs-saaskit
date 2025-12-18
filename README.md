@@ -61,6 +61,16 @@ A production-ready, **100% free and open-source** SaaS starter kit built with Ne
 - **Middleware**: Next.js middleware for route protection
 - **Guards**: API and UI guards for authorization
 - **Error Handling**: Centralized error handling with apiHandler
+- **API Documentation**: Complete OpenAPI/Swagger documentation at `/api/docs/v1`
+
+### Admin Dashboard
+- **User Management**: Full CRUD operations for users with pagination and search
+- **Role & Permission Management**: Create roles, assign permissions, manage user roles
+- **Analytics & Reporting**: System metrics, user statistics, revenue tracking
+- **SMTP Configuration**: Configure email sending with org-level overrides
+- **Email Templates**: Manage and customize email templates
+- **Settings Management**: System-wide configuration
+- **Audit Logs**: Complete audit trail of all system actions
 
 ### Database
 - **Prisma**: Type-safe database client
