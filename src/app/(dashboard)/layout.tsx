@@ -55,6 +55,13 @@ export default function DashboardLayout({
                   <BarChart3 className="h-4 w-4" />
                 </Link>
                 <Link
+                  href="/dashboard/audit-logs"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  title="Audit Logs"
+                >
+                  <FileText className="h-4 w-4" />
+                </Link>
+                <Link
                   href="/dashboard/settings"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground"
                   title="Settings"
