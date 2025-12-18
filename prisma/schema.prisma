@@ -324,6 +324,7 @@ model Organization {
   emailTemplates EmailTemplate[]
   notifications Notification[]
   systemSettings SystemSetting[]
+  featureFlags FeatureFlag[]
 
   @@index([ownerId])
   @@index([slug])
@@ -503,4 +504,24 @@ model SystemSetting {
   @@index([organizationId])
   @@index([key])
   @@map("system_settings")
+}
+
+// FeatureFlag model for feature toggles
+model FeatureFlag {
+  id             String   @id @default(cuid())
+  key            String   // e.g., "billing.enabled", "api.access"
+  enabled        Boolean  @default(false)
+  organizationId String?  // null = global flag
+  description    String?
+  updatedAt      DateTime @updatedAt
+  updatedBy      String?
+
+  // Relations
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, key]) // One flag per key per org
+  @@index([organizationId])
+  @@index([key])
+  @@index([enabled])
+  @@map("feature_flags")
 }
