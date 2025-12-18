@@ -188,6 +188,7 @@ model Plan {
   price       Decimal  @db.Decimal(10, 2)
   interval    PlanInterval
   features    Json?    // JSON array of feature strings
+  limits      Json?    // Plan limits: { "api_requests": 10000, "active_users": 50, "storage_bytes": 1073741824 }
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

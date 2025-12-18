@@ -9,6 +9,7 @@ const planSchema = z.object({
   price: z.number().positive(),
   interval: z.enum(["MONTHLY", "YEARLY"]),
   features: z.array(z.string()).optional(),
+  limits: z.record(z.number()).optional(), // e.g., { "api_requests": 10000, "active_users": 50 }
   active: z.boolean().optional().default(true),
 });
 
@@ -35,6 +36,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
       price: data.price,
       interval: data.interval,
       features: data.features || [],
+      limits: data.limits || {},
       active: data.active ?? true,
     },
   });

@@ -9,6 +9,7 @@ const updatePlanSchema = z.object({
   price: z.number().positive().optional(),
   interval: z.enum(["MONTHLY", "YEARLY"]).optional(),
   features: z.array(z.string()).optional(),
+  limits: z.record(z.number()).optional(),
   active: z.boolean().optional(),
 });
 
