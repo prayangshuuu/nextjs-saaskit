@@ -548,16 +548,17 @@ nextjs-saaskit/
 
 ## 🔮 Upcoming Features Roadmap
 
-- [ ] **Payment Integration**
-  - Stripe integration
-  - bKash integration
-  - SSLCommerz integration
-  - PipraPay integration
-- [ ] **Admin Dashboard**
-  - User management UI
-  - Role and permission management
-  - System configuration panel
-  - Analytics and reporting
+- [x] **Payment Integration**
+  - [x] Stripe integration
+  - [x] bKash integration (structure ready)
+  - [x] SSLCommerz integration (structure ready)
+  - [x] PipraPay integration (structure ready)
+- [x] **Admin Dashboard**
+  - [x] Plans management UI
+  - [x] Payment provider configuration UI
+  - [ ] User management UI
+  - [ ] Role and permission management UI
+  - [ ] Analytics and reporting
 - [ ] **Email Service**
   - SMTP integration
   - Email templates
@@ -566,11 +567,11 @@ nextjs-saaskit/
 - [ ] **Advanced Features**
   - Two-factor authentication (2FA)
   - Social login (OAuth)
-  - API rate limiting
+  - [x] API rate limiting
   - File uploads
-  - Webhooks
-- [ ] **Developer Experience**
-  - API documentation (Swagger/OpenAPI)
+  - [x] Webhooks (Stripe)
+- [x] **Developer Experience**
+  - [x] API documentation (Swagger/OpenAPI)
   - Testing suite (Jest/Vitest)
   - CI/CD pipeline
   - Docker support
