@@ -3,7 +3,7 @@ import { BrandingProvider } from "@/components/branding-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OrganizationSwitcher } from "@/components/organization-switcher";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Users, Settings, CreditCard, Wallet, Shield } from "lucide-react";
+import { LogOut, LayoutDashboard, Users, Settings, CreditCard, Wallet, Shield, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LogoutButton } from "./logout-button";
 
