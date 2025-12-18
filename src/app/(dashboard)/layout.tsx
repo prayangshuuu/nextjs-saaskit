@@ -62,6 +62,13 @@ export default function DashboardLayout({
                   <FileText className="h-4 w-4" />
                 </Link>
                 <Link
+                  href="/dashboard/smtp"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  title="SMTP Settings"
+                >
+                  <Mail className="h-4 w-4" />
+                </Link>
+                <Link
                   href="/dashboard/settings"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground"
                   title="Settings"
