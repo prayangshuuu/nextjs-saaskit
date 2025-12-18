@@ -18,6 +18,8 @@ model User {
   name          String?
   emailVerified Boolean   @default(false)
   emailVerifiedAt DateTime?
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret String?  // Encrypted TOTP secret
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -34,6 +36,7 @@ model User {
   ownedOrganizations Organization[] @relation("OrganizationOwner")
   notifications Notification[]
   notificationPreference NotificationPreference?
+  twoFactorRecoveryCodes TwoFactorRecoveryCode[]
 
   @@map("users")
 }
@@ -145,6 +148,23 @@ model EmailVerificationToken {
   @@index([userId])
   @@index([token])
   @@map("email_verification_tokens")
+}
+
+// Two-Factor Authentication Recovery Codes
+model TwoFactorRecoveryCode {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String   // Hashed recovery code
+  used      Boolean  @default(false)
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([code])
+  @@map("two_factor_recovery_codes")
 }
 
 // Enums

@@ -36,6 +36,36 @@ export const POST = apiHandler(async (request: NextRequest) => {
     );
   }
 
+  // Check if 2FA is enabled
+  if (user.twoFactorEnabled) {
+    const body = await request.json().catch(() => ({}));
+    const twoFactorToken = body.twoFactorToken;
+
+    if (!twoFactorToken) {
+      // Return response indicating 2FA is required
+      return NextResponse.json(
+        {
+          requiresTwoFactor: true,
+          userId: user.id,
+          message: "Two-factor authentication required",
+        },
+        { status: 200 }
+      );
+    }
+
+    // Verify 2FA token
+    const secret = decryptSecret(user.twoFactorSecret!);
+    const isValidTOTP = verifyTOTP(secret, twoFactorToken);
+    const isValidRecovery = await useRecoveryCode(user.id, twoFactorToken);
+
+    if (!isValidTOTP && !isValidRecovery) {
+      return NextResponse.json(
+        { error: "Invalid two-factor authentication code" },
+        { status: 401 }
+      );
+    }
+  }
+
   // Delete old sessions (optional: for security)
   await deleteAllUserSessions(user.id);
 
@@ -64,6 +94,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
       name: user.name,
       emailVerified: user.emailVerified,
       role: user.role.name,
+      twoFactorEnabled: user.twoFactorEnabled,
     },
   });
 
