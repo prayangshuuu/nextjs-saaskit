@@ -25,6 +25,17 @@ export const POST = apiHandler(async (request: NextRequest) => {
     });
   }
 
+  // Invalidate existing unused tokens for this user
+  await prisma.passwordResetToken.updateMany({
+    where: {
+      userId: user.id,
+      used: false,
+    },
+    data: {
+      used: true, // Mark as used to prevent multiple active tokens
+    },
+  });
+
   // Generate reset token
   const token = generateRandomToken();
   const expiresAt = new Date();

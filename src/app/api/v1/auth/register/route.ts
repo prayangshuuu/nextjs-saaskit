@@ -95,6 +95,22 @@ export const POST = apiHandler(async (request: NextRequest) => {
     maxAge: 60 * 60 * 24 * 7, // 7 days
   });
 
+  // Check if user already verified (prevent spam)
+  if (user.emailVerified) {
+    return response; // User already verified, don't send another email
+  }
+
+  // Invalidate existing unused tokens for this user
+  await prisma.emailVerificationToken.updateMany({
+    where: {
+      userId: user.id,
+      used: false,
+    },
+    data: {
+      used: true, // Mark as used to prevent multiple active tokens
+    },
+  });
+
   // Generate email verification token
   const verificationToken = generateRandomToken();
   const expiresAt = new Date();
