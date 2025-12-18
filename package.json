@@ -34,7 +34,6 @@
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.561.0",
     "next": "16.0.10",
-    "next-auth": "^5.0.0-beta.30",
     "nodemailer": "^7.0.11",
     "prisma": "^7.2.0",
     "react": "19.2.1",
