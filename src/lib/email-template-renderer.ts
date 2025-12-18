@@ -163,7 +163,7 @@ export async function renderEmailTemplate(
   // Add email footer branding
   const shouldShowAttribution = branding.showAttribution && !branding.hidePoweredBy;
   if (branding.footerText || shouldShowAttribution) {
-    const footer = branding.footerText || (shouldShowAttribution ? "Powered by SaaS Kit" : "");
+    const footer = branding.footerText || (shouldShowAttribution ? "Built with nextjs-saaskit" : "");
     if (footer) {
       html += `<div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 0.875rem;">${footer}</div>`;
       text += `\n\n---\n${footer}`;
