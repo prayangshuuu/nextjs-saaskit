@@ -10,208 +10,124 @@
 
 import { prisma } from "./prisma";
 
-// Cache for module states (in-memory, cleared on module updates)
+// Cache for module states (5 minute TTL)
 const moduleCache = new Map<string, { enabled: boolean; timestamp: number }>();
-const CACHE_TTL = 60 * 1000; // 60 seconds
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-interface ModuleContext {
-  organizationId?: string | null;
+export type ModuleScope = "GLOBAL" | "PUBLIC" | "AUTH" | "ADMIN";
+
+export interface ModuleContext {
   userId?: string;
-  roleId?: string;
+  organizationId?: string;
+  isAdmin?: boolean;
 }
 
 /**
  * Check if a module is enabled
  * 
  * @param key - Module key (e.g., "landing", "pricing", "billing")
- * @param context - Optional context (organizationId, userId, roleId)
+ * @param context - Optional context (user, org, admin status)
  * @returns true if module is enabled, false otherwise
  */
 export async function isModuleEnabled(
   key: string,
   context?: ModuleContext
 ): Promise<boolean> {
-  const cacheKey = `${key}:${context?.organizationId || "global"}`;
+  // Check cache first
+  const cacheKey = key;
   const cached = moduleCache.get(cacheKey);
+  const now = Date.now();
 
-  // Return cached value if still valid
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+  if (cached && (now - cached.timestamp) < CACHE_TTL) {
     return cached.enabled;
   }
 
-  // Check org-specific module first (if organizationId provided)
-  if (context?.organizationId) {
-    const orgModule = await prisma.systemModule.findFirst({
-      where: {
-        key,
-        organizationId: context.organizationId,
-      },
-    });
+  // Fetch from database
+  const module = await prisma.systemModule.findUnique({
+    where: { key },
+  });
 
-    if (orgModule) {
-      moduleCache.set(cacheKey, {
-        enabled: orgModule.enabled,
-        timestamp: Date.now(),
-      });
-      return orgModule.enabled;
+  if (!module) {
+    // Module doesn't exist - default to disabled for safety
+    moduleCache.set(cacheKey, { enabled: false, timestamp: now });
+    return false;
+  }
+
+  // Check scope-based access
+  if (context) {
+    // ADMIN scope requires admin user
+    if (module.scope === "ADMIN" && !context.isAdmin) {
+      moduleCache.set(cacheKey, { enabled: false, timestamp: now });
+      return false;
+    }
+
+    // AUTH scope requires authenticated user
+    if (module.scope === "AUTH" && !context.userId) {
+      moduleCache.set(cacheKey, { enabled: false, timestamp: now });
+      return false;
+    }
+  } else {
+    // No context provided - only allow PUBLIC and GLOBAL modules
+    if (module.scope !== "PUBLIC" && module.scope !== "GLOBAL") {
+      moduleCache.set(cacheKey, { enabled: false, timestamp: now });
+      return false;
     }
   }
 
-  // Fallback to global module
-  const globalModule = await prisma.systemModule.findFirst({
-    where: {
-      key,
-      organizationId: null,
-    },
-  });
-
-  const enabled = globalModule?.enabled ?? false;
-
-  // Cache the result
-  moduleCache.set(cacheKey, {
-    enabled,
-    timestamp: Date.now(),
-  });
-
-  return enabled;
+  // Cache and return
+  moduleCache.set(cacheKey, { enabled: module.enabled, timestamp: now });
+  return module.enabled;
 }
 
 /**
  * Get module details
  */
-export async function getModule(
-  key: string,
-  organizationId?: string | null
-): Promise<{
-  id: string;
-  key: string;
-  enabled: boolean;
-  description: string | null;
-  scope: string;
-  organizationId: string | null;
-} | null> {
-  if (organizationId) {
-    const orgModule = await prisma.systemModule.findFirst({
-      where: {
-        key,
-        organizationId,
-      },
-    });
-
-    if (orgModule) {
-      return orgModule;
-    }
-  }
-
-  return prisma.systemModule.findFirst({
-    where: {
-      key,
-      organizationId: null,
-    },
+export async function getModule(key: string) {
+  return prisma.systemModule.findUnique({
+    where: { key },
   });
 }
 
 /**
- * Get all modules (for admin UI)
+ * Get all modules
  */
-export async function getAllModules(organizationId?: string | null) {
-  const where: any = {};
-
-  if (organizationId !== undefined) {
-    where.organizationId = organizationId;
-  } else {
-    // Get both global and org-specific
-    return prisma.systemModule.findMany({
-      orderBy: [
-        { organizationId: "asc" },
-        { key: "asc" },
-      ],
-    });
-  }
-
+export async function getAllModules() {
   return prisma.systemModule.findMany({
-    where,
     orderBy: { key: "asc" },
   });
 }
 
 /**
- * Update module state (admin only)
+ * Update module state
  */
 export async function updateModule(
   key: string,
-  data: {
-    enabled?: boolean;
-    description?: string;
-    scope?: "GLOBAL" | "PUBLIC" | "AUTH" | "ADMIN";
-  },
-  organizationId?: string | null,
+  enabled: boolean,
   updatedBy?: string
 ) {
-  // Clear cache for this module
-  moduleCache.delete(`${key}:${organizationId || "global"}`);
+  // Invalidate cache
+  moduleCache.delete(key);
 
-  const where: any = {
-    key,
-    organizationId: organizationId ?? null,
-  };
-
-  const existing = await prisma.systemModule.findFirst({ where });
-
-  if (existing) {
-    return prisma.systemModule.update({
-      where: { id: existing.id },
-      data: {
-        ...data,
-        updatedBy,
-      },
-    });
-  } else {
-    return prisma.systemModule.create({
-      data: {
-        key,
-        organizationId: organizationId ?? null,
-        enabled: data.enabled ?? true,
-        description: data.description,
-        scope: data.scope ?? "GLOBAL",
-        updatedBy,
-      },
-    });
-  }
+  return prisma.systemModule.update({
+    where: { key },
+    data: {
+      enabled,
+      updatedBy,
+      updatedAt: new Date(),
+    },
+  });
 }
 
 /**
- * Clear module cache (call after module updates)
+ * Clear module cache (useful after admin updates)
  */
-export function clearModuleCache(key?: string) {
-  if (key) {
-    // Clear specific module cache
-    for (const cacheKey of moduleCache.keys()) {
-      if (cacheKey.startsWith(`${key}:`)) {
-        moduleCache.delete(cacheKey);
-      }
-    }
-  } else {
-    // Clear all cache
-    moduleCache.clear();
-  }
+export function clearModuleCache() {
+  moduleCache.clear();
 }
 
 /**
- * Batch check multiple modules
+ * Clear cache for specific module
  */
-export async function areModulesEnabled(
-  keys: string[],
-  context?: ModuleContext
-): Promise<Record<string, boolean>> {
-  const results: Record<string, boolean> = {};
-
-  await Promise.all(
-    keys.map(async (key) => {
-      results[key] = await isModuleEnabled(key, context);
-    })
-  );
-
-  return results;
+export function clearModuleCacheFor(key: string) {
+  moduleCache.delete(key);
 }
-
