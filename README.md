@@ -1,37 +1,477 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js SaaS Kit
 
-## Getting Started
+A production-ready SaaS starter kit built with Next.js, featuring authentication, role-based access control (RBAC), and a scalable architecture.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Core Features
+- ✅ **Next.js 16** with App Router and TypeScript
+- ✅ **Prisma ORM** with PostgreSQL
+- ✅ **JWT Authentication** with access and refresh tokens
+- ✅ **Role-Based Access Control (RBAC)** with permissions
+- ✅ **Email/Password Authentication**
+- ✅ **Email Verification** flow
+- ✅ **Password Reset** functionality
+- ✅ **Dark/Light Mode** toggle
+- ✅ **shadcn/ui** components with Tailwind CSS
+- ✅ **REST API** versioned under `/api/v1`
+- ✅ **Environment Validation** with Zod
+- ✅ **Secure Middleware** for route protection
+
+### Authentication & Security
+- Secure password hashing with bcrypt
+- HTTP-only cookies for token storage
+- Session management
+- Refresh token rotation
+- Protected API routes
+- Middleware-based route guards
+
+### RBAC System
+- **Roles**: ADMIN, USER (extensible)
+- **Permissions**: Resource-based (USERS, SETTINGS, BILLING, CRUD) with actions (CREATE, READ, UPDATE, DELETE, MANAGE)
+- **API Guards**: Permission-based API route protection
+- **UI Guards**: Client and server-side component guards
+- **Middleware**: Automatic route protection
+
+## 📋 Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui (Radix UI)
+- **Authentication**: JWT (jsonwebtoken)
+- **Password Hashing**: bcryptjs
+- **Validation**: Zod
+- **Icons**: Lucide React
+
+## 🏗️ System Architecture
+
+### Frontend
+- **App Router**: Next.js 16 App Router with route groups
+- **Layouts**: Separate layouts for auth and dashboard
+- **Components**: Reusable UI components with shadcn/ui
+- **Theme**: Dark/light mode with system preference support
+
+### Backend
+- **API Routes**: RESTful API under `/api/v1`
+- **Middleware**: Next.js middleware for route protection
+- **Guards**: API and UI guards for authorization
+- **Error Handling**: Centralized error handling with apiHandler
+
+### Database
+- **Prisma**: Type-safe database client
+- **Migrations**: Prisma migrations for schema management
+- **Seeding**: Automated seed script for initial data
+
+## 📊 Database Model
+
+### Tables
+
+#### `users`
+- `id` (String, Primary Key)
+- `email` (String, Unique)
+- `password` (String, Hashed)
+- `name` (String, Optional)
+- `emailVerified` (Boolean)
+- `emailVerifiedAt` (DateTime, Optional)
+- `roleId` (String, Foreign Key → roles)
+- `createdAt`, `updatedAt` (DateTime)
+
+#### `roles`
+- `id` (String, Primary Key)
+- `name` (String, Unique) - e.g., "ADMIN", "USER"
+- `description` (String, Optional)
+- `createdAt`, `updatedAt` (DateTime)
+
+#### `permissions`
+- `id` (String, Primary Key)
+- `name` (String, Unique) - e.g., "USERS_CREATE"
+- `description` (String, Optional)
+- `resource` (String) - e.g., "USERS", "SETTINGS", "BILLING", "CRUD"
+- `action` (String) - e.g., "CREATE", "READ", "UPDATE", "DELETE", "MANAGE"
+- `createdAt`, `updatedAt` (DateTime)
+
+#### `role_permissions`
+- `id` (String, Primary Key)
+- `roleId` (String, Foreign Key → roles)
+- `permissionId` (String, Foreign Key → permissions)
+- `createdAt` (DateTime)
+- Unique constraint on `[roleId, permissionId]`
+
+#### `sessions`
+- `id` (String, Primary Key)
+- `userId` (String, Foreign Key → users)
+- `token` (String, Unique)
+- `expiresAt` (DateTime)
+- `createdAt` (DateTime)
+
+#### `refresh_tokens`
+- `id` (String, Primary Key)
+- `userId` (String, Foreign Key → users)
+- `token` (String, Unique)
+- `expiresAt` (DateTime)
+- `createdAt` (DateTime)
+
+#### `password_reset_tokens`
+- `id` (String, Primary Key)
+- `userId` (String, Foreign Key → users)
+- `token` (String, Unique)
+- `expiresAt` (DateTime)
+- `used` (Boolean)
+- `createdAt` (DateTime)
+
+#### `email_verification_tokens`
+- `id` (String, Primary Key)
+- `userId` (String)
+- `token` (String, Unique)
+- `expiresAt` (DateTime)
+- `used` (Boolean)
+- `createdAt` (DateTime)
+
+## 🔌 API Structure
+
+All API routes are versioned under `/api/v1`.
+
+### Authentication Endpoints
+
+#### `POST /api/v1/auth/register`
+Register a new user.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "name": "John Doe" // optional
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Response:**
+```json
+{
+  "user": {
+    "id": "user_id",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "emailVerified": false
+  }
+}
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+#### `POST /api/v1/auth/login`
+Login with email and password.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
 
-## Learn More
+**Response:**
+```json
+{
+  "user": {
+    "id": "user_id",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "emailVerified": true,
+    "role": "USER"
+  }
+}
+```
 
-To learn more about Next.js, take a look at the following resources:
+#### `POST /api/v1/auth/logout`
+Logout and invalidate sessions.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Response:**
+```json
+{
+  "message": "Logged out successfully"
+}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#### `GET /api/v1/auth/me`
+Get current user information.
 
-## Deploy on Vercel
+**Response:**
+```json
+{
+  "user": {
+    "id": "user_id",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "emailVerified": true,
+    "role": {
+      "id": "role_id",
+      "name": "USER",
+      "permissions": [...]
+    }
+  }
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### `POST /api/v1/auth/verify-email`
+Verify email with token.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# nextjs-saaskit
+**Request Body:**
+```json
+{
+  "token": "verification_token"
+}
+```
+
+#### `POST /api/v1/auth/forgot-password`
+Request password reset.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+#### `POST /api/v1/auth/reset-password`
+Reset password with token.
+
+**Request Body:**
+```json
+{
+  "token": "reset_token",
+  "password": "new_password123"
+}
+```
+
+## 👥 Admin vs User Capabilities
+
+### Admin Capabilities
+- Full system access
+- All permissions granted automatically
+- Access to admin-only routes (`/api/v1/admin/*`)
+- User management
+- System configuration
+- All CRUD operations
+
+### User Capabilities
+- Limited access based on assigned permissions
+- Default permissions:
+  - Read access to CRUD resources
+  - Read access to Settings
+- Can update own profile
+- Cannot access admin routes
+
+## 🔐 Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/nextjs_saaskit?schema=public"
+
+# JWT Secrets (generate strong random strings, minimum 32 characters)
+JWT_SECRET="your-super-secret-jwt-key-min-32-chars-long"
+JWT_REFRESH_SECRET="your-super-secret-refresh-key-min-32-chars-long"
+JWT_ACCESS_EXPIRES_IN="15m"
+JWT_REFRESH_EXPIRES_IN="7d"
+
+# App
+NODE_ENV="development"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+# Email (Optional - for production)
+SMTP_HOST=""
+SMTP_PORT=""
+SMTP_USER=""
+SMTP_PASSWORD=""
+SMTP_FROM=""
+```
+
+## 🚀 Setup & Deployment Guide
+
+### Prerequisites
+- Node.js 18+ 
+- PostgreSQL database
+- npm or yarn
+
+### Local Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd nextjs-saaskit
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your database URL and secrets
+   ```
+
+4. **Set up the database**
+   ```bash
+   # Generate Prisma client
+   npm run db:generate
+
+   # Run migrations
+   npm run db:migrate
+
+   # Seed the database
+   npm run db:seed
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**
+   Navigate to `http://localhost:3000`
+
+### Production Deployment
+
+1. **Build the application**
+   ```bash
+   npm run build
+   ```
+
+2. **Run migrations in production**
+   ```bash
+   npx prisma migrate deploy
+   ```
+
+3. **Start the production server**
+   ```bash
+   npm start
+   ```
+
+### Database Migrations
+
+```bash
+# Create a new migration
+npm run db:migrate
+
+# Apply migrations in production
+npx prisma migrate deploy
+
+# Open Prisma Studio (database GUI)
+npm run db:studio
+```
+
+## 👤 Seed Users
+
+After running `npm run db:seed`, the following users are created:
+
+### Admin User
+- **Email**: `admin@prayangshu.com`
+- **Password**: `Kit321!SaaS`
+- **Role**: ADMIN
+- **Permissions**: All permissions
+
+### Regular User
+- **Email**: `user@prayangshu.com`
+- **Password**: `Kit321!SaaS`
+- **Role**: USER
+- **Permissions**: Basic read permissions
+
+## 🛡️ Security Features
+
+- **Password Hashing**: bcrypt with salt rounds of 12
+- **JWT Tokens**: Secure token generation and validation
+- **HTTP-Only Cookies**: Prevents XSS attacks
+- **CSRF Protection**: SameSite cookie attribute
+- **Route Guards**: Middleware and API guards
+- **Input Validation**: Zod schema validation
+- **SQL Injection Prevention**: Prisma ORM parameterized queries
+
+## 📁 Project Structure
+
+```
+nextjs-saaskit/
+├── prisma/
+│   ├── schema.prisma          # Database schema
+│   └── seed.ts                 # Seed script
+├── src/
+│   ├── app/
+│   │   ├── (auth)/            # Auth route group
+│   │   │   ├── login/
+│   │   │   └── register/
+│   │   ├── (dashboard)/       # Dashboard route group
+│   │   │   └── dashboard/
+│   │   ├── api/
+│   │   │   └── v1/
+│   │   │       └── auth/     # Auth API routes
+│   │   ├── layout.tsx         # Root layout
+│   │   ├── page.tsx           # Home page
+│   │   └── globals.css        # Global styles
+│   ├── components/
+│   │   ├── guards/           # Auth & admin guards
+│   │   ├── ui/               # shadcn/ui components
+│   │   ├── theme-provider.tsx
+│   │   └── theme-toggle.tsx
+│   ├── lib/
+│   │   ├── auth.ts           # Auth utilities
+│   │   ├── rbac.ts           # RBAC utilities
+│   │   ├── api-guards.ts     # API guards
+│   │   ├── server-guards.ts  # Server-side guards
+│   │   ├── env.ts            # Environment validation
+│   │   ├── prisma.ts         # Prisma client
+│   │   └── utils.ts          # Utility functions
+│   └── middleware.ts         # Next.js middleware
+├── .env.example              # Environment variables template
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+## 🔮 Upcoming Features Roadmap
+
+- [ ] **Payment Integration**
+  - Stripe integration
+  - bKash integration
+  - SSLCommerz integration
+  - PipraPay integration
+- [ ] **Admin Dashboard**
+  - User management UI
+  - Role and permission management
+  - System configuration panel
+  - Analytics and reporting
+- [ ] **Email Service**
+  - SMTP integration
+  - Email templates
+  - Email verification emails
+  - Password reset emails
+- [ ] **Advanced Features**
+  - Two-factor authentication (2FA)
+  - Social login (OAuth)
+  - API rate limiting
+  - File uploads
+  - Webhooks
+- [ ] **Developer Experience**
+  - API documentation (Swagger/OpenAPI)
+  - Testing suite (Jest/Vitest)
+  - CI/CD pipeline
+  - Docker support
+
+## 📝 License
+
+This project is private and proprietary.
+
+## 🤝 Contributing
+
+This is a starter kit. Feel free to fork and customize for your needs.
+
+## 📧 Support
+
+For issues and questions, please open an issue in the repository.
+
+---
+
+**Built with ❤️ using Next.js**
