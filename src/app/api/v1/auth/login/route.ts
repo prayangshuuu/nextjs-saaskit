@@ -8,11 +8,12 @@ import { apiHandler } from "@/lib/api-guards";
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string(),
+  twoFactorToken: z.string().optional(),
 });
 
 export const POST = apiHandler(async (request: NextRequest) => {
   const body = await request.json();
-  const { email, password } = loginSchema.parse(body);
+  const { email, password, twoFactorToken } = loginSchema.parse(body);
 
   // Find user
   const user = await prisma.user.findUnique({
@@ -38,7 +39,6 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
   // Check if 2FA is enabled
   if (user.twoFactorEnabled) {
-    const twoFactorToken = body.twoFactorToken;
 
     if (!twoFactorToken) {
       // Return response indicating 2FA is required
