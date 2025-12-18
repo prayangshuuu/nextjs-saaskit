@@ -1,5 +1,6 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { OrganizationSwitcher } from "@/components/organization-switcher";
 import Link from "next/link";
 import { LogOut, LayoutDashboard, Users, Settings, CreditCard, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ export default function DashboardLayout({
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <OrganizationSwitcher />
               <ThemeToggle />
               <LogoutButton />
             </div>

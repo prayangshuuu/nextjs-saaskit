@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyAccessToken } from "./lib/jwt";
+import { getTenantFromRequest, setTenantContext } from "./lib/tenant";
 
 // Public routes that don't require authentication
 const publicRoutes = [
@@ -25,13 +26,19 @@ const protectedRoutes = ["/dashboard", "/api/v1"];
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Set tenant context from request (for Prisma middleware)
+  const tenantId = getTenantFromRequest(request);
+  setTenantContext(tenantId);
+
   // Check for API key authentication (rate limiting handled in API routes)
   // Note: API key verification happens in API route handlers, not middleware
   // to avoid Prisma client issues in Edge runtime
 
   // Allow public routes
   if (publicRoutes.some((route) => pathname.startsWith(route))) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    clearTenantContext();
+    return response;
   }
 
   // Check for authentication token
@@ -75,7 +82,13 @@ export async function middleware(request: NextRequest) {
     // Token validation happens here, admin check happens in API handlers
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  // Note: Tenant context is cleared in apiHandler, but we clear here too for safety
+  return response;
+}
+
+function clearTenantContext() {
+  delete (globalThis as any).__tenantId;
 }
 
 export const config = {
