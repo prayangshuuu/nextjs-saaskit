@@ -5,12 +5,12 @@ const settingsCache = new Map<string, { value: any; timestamp: number }>();
 const CACHE_TTL = 60 * 1000; // 1 minute
 
 // Simple encryption/decryption (in production, use proper encryption library)
-function encryptSecret(value: string): string {
+export function encryptSecret(value: string): string {
   // In production, use crypto.createCipheriv or a library like @aws-sdk/client-kms
   return Buffer.from(value).toString("base64");
 }
 
-function decryptSecret(encrypted: string): string {
+export function decryptSecret(encrypted: string): string {
   return Buffer.from(encrypted, "base64").toString("utf-8");
 }
 

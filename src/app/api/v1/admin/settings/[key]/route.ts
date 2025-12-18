@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { requireAdmin, apiHandler } from "@/lib/api-guards";
-import { setSetting, SettingType } from "@/lib/settings-service";
-import { getAuthenticatedUser } from "@/lib/api-guards";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin, apiHandler, getAuthenticatedUser } from "@/lib/api-guards";
+import { setSetting, SettingType, decryptSecret } from "@/lib/settings-service";
 
 const updateSettingSchema = z.object({
   value: z.any(),
