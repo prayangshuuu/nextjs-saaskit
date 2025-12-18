@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword, generateAccessToken, generateRefreshToken, createSession, createRefreshToken, deleteAllUserSessions } from "@/lib/auth";
+import { verifyPassword, createSession, createRefreshToken, deleteAllUserSessions } from "@/lib/auth";
+import { generateAccessToken, generateRefreshToken } from "@/lib/jwt";
 import { apiHandler } from "@/lib/api-guards";
 
 const loginSchema = z.object({

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAccessToken } from "./auth";
+import { verifyAccessToken } from "./jwt";
 import { hasPermission, isAdmin, PermissionResource, PermissionAction } from "./rbac";
 import { checkRateLimit, getRateLimitIdentifier } from "./rate-limit";
 import { verifyApiKey } from "./api-keys";

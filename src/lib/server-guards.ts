@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { verifyAccessToken } from "./auth";
+import { verifyAccessToken } from "./jwt";
 import { isAdmin, hasPermission, PermissionResource, PermissionAction } from "./rbac";
 
 export async function requireAuthServer() {

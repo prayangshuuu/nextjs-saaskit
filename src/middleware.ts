@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyAccessToken } from "./lib/auth";
+import { verifyAccessToken } from "./lib/jwt";
 
 // Public routes that don't require authentication
 const publicRoutes = [

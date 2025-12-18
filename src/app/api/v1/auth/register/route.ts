@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, generateAccessToken, generateRefreshToken, createSession, createRefreshToken } from "@/lib/auth";
+import { hashPassword, createSession, createRefreshToken } from "@/lib/auth";
+import { generateAccessToken, generateRefreshToken } from "@/lib/jwt";
 import { RoleName } from "@/lib/rbac";
 import { apiHandler } from "@/lib/api-guards";
 

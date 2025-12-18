@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAccessToken } from "./auth";
+import { verifyAccessToken } from "./jwt";
 import { hasPermission, isAdmin, PermissionResource, PermissionAction } from "./rbac";
 
 export interface AuthenticatedRequest extends NextRequest {
