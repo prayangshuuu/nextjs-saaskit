@@ -32,6 +32,8 @@ model User {
   apiKeys       ApiKey[]
   organizationMembers OrganizationMember[]
   ownedOrganizations Organization[] @relation("OrganizationOwner")
+  notifications Notification[]
+  notificationPreference NotificationPreference?
 
   @@map("users")
 }
@@ -320,6 +322,7 @@ model Organization {
   auditLogs   AuditLog[]
   smtpConfig  SmtpConfig?
   emailTemplates EmailTemplate[]
+  notifications Notification[]
 
   @@index([ownerId])
   @@index([slug])
@@ -436,4 +439,46 @@ model EmailTemplate {
   @@index([key])
   @@index([enabled])
   @@map("email_templates")
+}
+
+// Notification model for in-app and email notifications
+model Notification {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  type           String   // e.g., "info", "success", "warning", "error"
+  title          String
+  message        String
+  metadata       Json?    // Additional context
+  read           Boolean  @default(false)
+  readAt         DateTime?
+  emailSent      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  // Relations
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([read])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// NotificationPreference model for user notification preferences
+model NotificationPreference {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  emailEnabled   Boolean  @default(true)
+  inAppEnabled   Boolean  @default(true)
+  preferences    Json?    // Channel-specific preferences
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notification_preferences")
 }
