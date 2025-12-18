@@ -663,7 +663,9 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 We welcome contributions! This is an open-source project under the MIT License.
 
-### How to Contribute
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
+
+### Quick Start
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -674,17 +676,18 @@ We welcome contributions! This is an open-source project under the MIT License.
 ### Contribution Guidelines
 
 - Follow the existing code style
-- Write clear commit messages
+- Write clear commit messages (see CONTRIBUTING.md)
 - Add tests for new features
 - Update documentation as needed
 - Ensure all tests pass
 
 ### Open Source Philosophy
 
-- **Free Forever**: The open-source version will always remain free
-- **No Restrictions**: No features are restricted in the OSS version
+- **100% Free & Open Source**: No monetization, no paywalls, no restrictions
+- **No Tracking**: No telemetry or tracking by default
 - **Transparency**: All code is open and auditable
 - **Community First**: Community contributions are welcome and valued
+- **Maintainer-Led**: Project direction guided by maintainer with community input
 
 ## 📧 Support
 
