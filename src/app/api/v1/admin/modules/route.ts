@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin, apiHandler } from "@/lib/api-guards";
-import { getAllModules, updateModule, clearModuleCache } from "@/lib/module-service";
+import { getAllModules, updateModule, clearModuleCacheFor } from "@/lib/module-service";
 import { getTenantFromRequest } from "@/lib/tenant";
 import { z } from "zod";
 
@@ -98,7 +98,7 @@ export const PUT = apiHandler(
     );
 
     // Clear module cache after update
-    clearModuleCache(data.key);
+    clearModuleCacheFor(data.key);
 
     return NextResponse.json({ module: updated });
   },
