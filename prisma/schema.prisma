@@ -319,6 +319,7 @@ model Organization {
   usageRecords UsageRecord[]
   auditLogs   AuditLog[]
   smtpConfig  SmtpConfig?
+  emailTemplates EmailTemplate[]
 
   @@index([ownerId])
   @@index([slug])
@@ -413,4 +414,26 @@ model SmtpConfig {
   @@index([organizationId])
   @@index([enabled])
   @@map("smtp_configs")
+}
+
+// EmailTemplate model for email templates
+model EmailTemplate {
+  id             String   @id @default(cuid())
+  key            String   // e.g., "welcome", "reset-password", "invoice-paid"
+  subject        String
+  htmlBody       String
+  textBody       String?
+  enabled        Boolean  @default(true)
+  organizationId String?  // null = global template
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, key]) // One template per key per org
+  @@index([organizationId])
+  @@index([key])
+  @@index([enabled])
+  @@map("email_templates")
 }
