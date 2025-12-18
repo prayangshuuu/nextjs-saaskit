@@ -3,7 +3,7 @@ import { BrandingProvider } from "@/components/branding-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OrganizationSwitcher } from "@/components/organization-switcher";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Users, Settings, CreditCard, Wallet } from "lucide-react";
+import { LogOut, LayoutDashboard, Users, Settings, CreditCard, Wallet, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LogoutButton } from "./logout-button";
 
@@ -32,8 +32,16 @@ export default function DashboardLayout({
                 <Link
                   href="/dashboard/users"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  title="Users"
                 >
                   <Users className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/dashboard/roles"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  title="Roles & Permissions"
+                >
+                  <Shield className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/dashboard/subscriptions"
