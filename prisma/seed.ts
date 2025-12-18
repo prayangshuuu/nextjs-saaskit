@@ -273,6 +273,86 @@ async function main() {
   }
   console.log("✅ Email templates created");
 
+  // Create default branding settings
+  console.log("Creating branding settings...");
+  const brandingSettings = [
+    {
+      key: "app.name",
+      value: "SaaS Kit",
+      type: "string",
+      description: "Application name",
+    },
+    {
+      key: "app.logo",
+      value: "",
+      type: "string",
+      description: "Application logo URL",
+    },
+    {
+      key: "app.favicon",
+      value: "",
+      type: "string",
+      description: "Application favicon URL",
+    },
+    {
+      key: "brand.primaryColor",
+      value: "#3b82f6",
+      type: "string",
+      description: "Primary brand color",
+    },
+    {
+      key: "brand.secondaryColor",
+      value: "#8b5cf6",
+      type: "string",
+      description: "Secondary brand color",
+    },
+    {
+      key: "brand.radius",
+      value: "0.5rem",
+      type: "string",
+      description: "Border radius for UI elements",
+    },
+    {
+      key: "brand.font",
+      value: "Inter",
+      type: "string",
+      description: "Primary font family",
+    },
+    {
+      key: "whiteLabel.hidePoweredBy",
+      value: false,
+      type: "boolean",
+      description: "Hide 'Powered by' footer",
+    },
+    {
+      key: "whiteLabel.footerText",
+      value: "",
+      type: "string",
+      description: "Custom footer text",
+    },
+  ];
+
+  for (const setting of brandingSettings) {
+    await prisma.systemSetting.upsert({
+      where: {
+        organizationId_key: {
+          organizationId: null,
+          key: setting.key,
+        },
+      },
+      update: {},
+      create: {
+        key: setting.key,
+        value: setting.value,
+        type: setting.type,
+        isSecret: false,
+        organizationId: null,
+        description: setting.description,
+      },
+    });
+  }
+  console.log("✅ Branding settings created");
+
   console.log("\n📋 Seed Summary:");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("Admin User:");
