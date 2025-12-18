@@ -5,6 +5,8 @@ import { Check } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { PricingButton } from "@/components/pricing-button";
+import { isModuleEnabled } from "@/lib/module-service";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -21,6 +23,13 @@ async function getPlans() {
 }
 
 export default async function PricingPage() {
+  // Check if pricing module is enabled
+  const pricingEnabled = await isModuleEnabled("pricing");
+  
+  if (!pricingEnabled) {
+    redirect("/");
+  }
+
   const plans = await getPlans();
 
   // Parse features from JSON

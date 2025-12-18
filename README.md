@@ -274,7 +274,15 @@ If you do not have full repository context (e.g., you're reading only the README
 - **Disabled UI Components**: Hidden or disabled
 - **Changes Apply Instantly**: No code deployment required
 
-**Admin Control**: Access module management at `/dashboard/admin/modules` (admin only)
+**Admin Control**: 
+- Access module management at `/dashboard/admin/modules` (admin only)
+- Control landing page sections at `/dashboard/admin/landing` (admin only)
+- Enable/disable coming soon mode via `coming_soon` module
+
+**System-Wide Toggles**:
+- **Coming Soon Mode**: When enabled, all public pages redirect to `/coming-soon` (admins can bypass)
+- **REST API Toggle**: Disabling `rest_api` module blocks all `/api/v1` routes
+- **Billing & Pricing**: Disabling `billing` or `pricing` modules hides those features from UI and blocks API access
 
 ### Database
 - **Prisma**: Type-safe database client
