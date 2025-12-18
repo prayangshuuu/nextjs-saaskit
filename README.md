@@ -358,6 +358,11 @@ Delete a subscription plan (Admin only). Cannot delete plans with active subscri
   - Manage plan pricing, intervals (monthly/yearly)
   - Configure plan features
   - Toggle plan active/inactive status
+- **Payment Provider Configuration**: Manage payment gateway settings
+  - Enable/disable payment providers (Stripe, bKash, SSLCommerz, PipraPay)
+  - Configure API keys and secrets securely
+  - Toggle test/live mode
+  - Manage provider-specific settings
 - System configuration
 - All CRUD operations
 

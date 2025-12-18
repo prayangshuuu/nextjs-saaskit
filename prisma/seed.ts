@@ -181,6 +181,24 @@ async function main() {
   });
 
   console.log("✅ Users created");
+
+  // Create Payment Providers
+  console.log("Creating payment providers...");
+  const providerTypes = ["STRIPE", "BKASH", "SSLCOMMERZ", "PIPRAPAY"];
+
+  for (const type of providerTypes) {
+    await prisma.paymentProvider.upsert({
+      where: { type },
+      update: {},
+      create: {
+        type,
+        enabled: false,
+        testMode: true,
+      },
+    });
+  }
+
+  console.log("✅ Payment providers created");
   console.log("\n📋 Seed Summary:");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("Admin User:");
@@ -189,6 +207,9 @@ async function main() {
   console.log("\nRegular User:");
   console.log("  Email: user@prayangshu.com");
   console.log("  Password: Kit321!SaaS");
+  console.log("\nPayment Providers:");
+  console.log("  STRIPE, BKASH, SSLCOMMERZ, PIPRAPAY");
+  console.log("  (Configure via admin dashboard)");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 }
 

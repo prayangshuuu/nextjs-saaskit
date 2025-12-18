@@ -1,7 +1,7 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Users, Settings, CreditCard } from "lucide-react";
+import { LogOut, LayoutDashboard, Users, Settings, CreditCard, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LogoutButton } from "./logout-button";
 
@@ -35,12 +35,21 @@ export default function DashboardLayout({
                 <Link
                   href="/dashboard/plans"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  title="Plans"
                 >
                   <CreditCard className="h-4 w-4" />
                 </Link>
                 <Link
+                  href="/dashboard/payments"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  title="Payment Providers"
+                >
+                  <Wallet className="h-4 w-4" />
+                </Link>
+                <Link
                   href="/dashboard/settings"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  title="Settings"
                 >
                   <Settings className="h-4 w-4" />
                 </Link>
