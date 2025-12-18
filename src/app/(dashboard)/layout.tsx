@@ -3,7 +3,7 @@ import { BrandingProvider } from "@/components/branding-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OrganizationSwitcher } from "@/components/organization-switcher";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Users, Settings, CreditCard, Wallet, Shield, TrendingUp, ToggleLeft, BarChart3, FileText, Mail } from "lucide-react";
+import { LogOut, LayoutDashboard, Users, Settings, CreditCard, Wallet, Shield, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LogoutButton } from "./logout-button";
 
@@ -84,13 +84,6 @@ export default function DashboardLayout({
                   title="Settings"
                 >
                   <Settings className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="/dashboard/admin/modules"
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
-                  title="System Modules"
-                >
-                  <ToggleLeft className="h-4 w-4" />
                 </Link>
               </div>
             </div>

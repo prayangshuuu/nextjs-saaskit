@@ -130,48 +130,34 @@ async function main() {
   // Create default system modules
   console.log("Creating system modules...");
   const defaultModules = [
-    { key: "landing", enabled: true, description: "Landing page", scope: "GLOBAL" },
-    { key: "pricing", enabled: true, description: "Pricing page and plans", scope: "GLOBAL" },
-    { key: "billing", enabled: true, description: "Billing and subscriptions", scope: "GLOBAL" },
-    { key: "auth", enabled: true, description: "Authentication (login, register, 2FA)", scope: "AUTH" },
-    { key: "rest_api", enabled: true, description: "REST API access", scope: "PUBLIC" },
+    { key: "landing", enabled: true, description: "Landing page", scope: "PUBLIC" },
+    { key: "pricing", enabled: true, description: "Pricing page and plans", scope: "PUBLIC" },
+    { key: "billing", enabled: true, description: "Billing and subscriptions", scope: "AUTH" },
+    { key: "auth", enabled: true, description: "Authentication system", scope: "PUBLIC" },
+    { key: "rest_api", enabled: true, description: "REST API access", scope: "AUTH" },
     { key: "api_docs", enabled: true, description: "API documentation", scope: "PUBLIC" },
     { key: "dashboard", enabled: true, description: "User dashboard", scope: "AUTH" },
     { key: "admin", enabled: true, description: "Admin dashboard", scope: "ADMIN" },
-    { key: "file_uploads", enabled: true, description: "File upload functionality", scope: "GLOBAL" },
-    { key: "notifications", enabled: true, description: "Notification system", scope: "GLOBAL" },
+    { key: "file_uploads", enabled: true, description: "File upload system", scope: "AUTH" },
+    { key: "notifications", enabled: true, description: "Notification system", scope: "AUTH" },
   ];
 
   for (const module of defaultModules) {
-    // Check if module exists (using findFirst since unique constraint with null is tricky)
-    const existing = await prisma.systemModule.findFirst({
-      where: {
+    await prisma.systemModule.upsert({
+      where: { key: module.key },
+      update: {
+        description: module.description,
+        scope: module.scope,
+      },
+      create: {
         key: module.key,
-        organizationId: null,
+        enabled: module.enabled,
+        description: module.description,
+        scope: module.scope,
       },
     });
-
-    if (existing) {
-      await prisma.systemModule.update({
-        where: { id: existing.id },
-        data: {
-          enabled: module.enabled,
-          description: module.description,
-          scope: module.scope,
-        },
-      });
-    } else {
-      await prisma.systemModule.create({
-        data: {
-          key: module.key,
-          enabled: module.enabled,
-          description: module.description,
-          scope: module.scope,
-          organizationId: null, // Global modules
-        },
-      });
-    }
   }
+
   console.log("✅ System modules created");
 
   console.log("\n📋 Seed Summary:");

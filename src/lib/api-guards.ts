@@ -2,9 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken } from "./jwt";
 import { hasPermission, isAdmin, PermissionResource, PermissionAction } from "./rbac";
 import { getTenantFromRequest, setTenantContext } from "./tenant";
-import { checkApiModuleAccess } from "./module-enforcement";
-import { withUsageTracking } from "./usage-middleware";
-import { createAuditLog, getClientInfo, maskSensitiveData } from "./audit-log";
 
 export interface AuthenticatedRequest extends NextRequest {
   user?: {
@@ -75,20 +72,44 @@ export function apiHandler(
     let user: { userId: string; email: string; roleId: string } | null = null;
     let response: NextResponse;
 
+    // Check maintenance mode (bypass for admin)
+    try {
+      const { isMaintenanceMode, getMaintenanceMessage } = await import("./maintenance");
+      const tenantId = getTenantFromRequest(request);
+      const maintenanceEnabled = await isMaintenanceMode(tenantId);
+
+      if (maintenanceEnabled) {
+        // Check if user is admin
+        user = await getAuthenticatedUser(request);
+        if (user) {
+          const admin = await isAdmin(user.userId);
+          if (!admin) {
+            const message = await getMaintenanceMessage(tenantId);
+            return NextResponse.json(
+              { error: "Service temporarily unavailable", message },
+              { status: 503 }
+            );
+          }
+        } else {
+          // Not authenticated, return maintenance
+          const message = await getMaintenanceMessage(tenantId);
+          return NextResponse.json(
+            { error: "Service temporarily unavailable", message },
+            { status: 503 }
+          );
+        }
+      }
+    } catch (error) {
+      // If maintenance check fails, continue (fail open)
+      console.error("Maintenance check failed:", error);
+    }
+
     try {
       // Set tenant context from request
       const tenantId = getTenantFromRequest(request);
       setTenantContext(tenantId);
 
-      // Check module access (enforce module system) - FIRST CHECK
-      const moduleCheck = await checkApiModuleAccess(request);
-      if (moduleCheck) {
-        setTenantContext(null);
-        return moduleCheck;
-      }
-
       // Check maintenance mode (bypass for admin)
-      const { isMaintenanceMode, getMaintenanceMessage } = await import("./maintenance");
       const maintenanceEnabled = await isMaintenanceMode(tenantId);
       if (maintenanceEnabled) {
         // Get user to check if admin

@@ -396,7 +396,6 @@ model Organization {
   notifications Notification[]
   systemSettings SystemSetting[]
   featureFlags FeatureFlag[]
-  systemModules SystemModule[]
   fileUploads   FileUpload[]
 
   @@index([ownerId])
@@ -599,6 +598,23 @@ model FeatureFlag {
   @@map("feature_flags")
 }
 
+// SystemModule model for module-driven feature control
+model SystemModule {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g., "landing", "pricing", "billing", "api", "auth", "docs"
+  enabled     Boolean  @default(true)
+  description String?
+  scope       String   @default("GLOBAL") // GLOBAL, PUBLIC, AUTH, ADMIN
+  metadata    Json?    // Additional module configuration
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?  // User who last updated
+
+  @@index([key])
+  @@index([enabled])
+  @@index([scope])
+  @@map("system_modules")
+}
+
 // TelemetryEvent model for optional, opt-in telemetry
 model TelemetryEvent {
   id        String   @id @default(cuid())
@@ -610,33 +626,4 @@ model TelemetryEvent {
   @@index([event])
   @@index([timestamp])
   @@map("telemetry_events")
-}
-
-// SystemModule model for module-driven platform control
-enum ModuleScope {
-  GLOBAL   // System-wide module (e.g., landing, pricing)
-  PUBLIC   // Public-facing module (e.g., auth, docs)
-  AUTH     // Authentication-related module
-  ADMIN    // Admin-only module
-}
-
-model SystemModule {
-  id          String      @id @default(cuid())
-  key         String      @unique // e.g., "landing", "pricing", "billing", "api", "auth", "docs"
-  enabled     Boolean     @default(true)
-  description String?     // Human-readable description
-  scope       ModuleScope @default(GLOBAL)
-  organizationId String?  // null = global module, otherwise org-specific override
-  updatedAt   DateTime    @updatedAt
-  updatedBy   String?     // User who last updated
-
-  // Relations
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@unique([organizationId, key]) // One module per key per org
-  @@index([key])
-  @@index([enabled])
-  @@index([scope])
-  @@index([organizationId])
-  @@map("system_modules")
 }
