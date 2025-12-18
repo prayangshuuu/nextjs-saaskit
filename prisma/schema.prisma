@@ -27,6 +27,8 @@ model User {
   sessions      Session[]
   refreshTokens RefreshToken[]
   passwordResetTokens PasswordResetToken[]
+  subscriptions Subscription[]
+  invoices      Invoice[]
 
   @@map("users")
 }
@@ -138,4 +140,120 @@ model EmailVerificationToken {
   @@index([userId])
   @@index([token])
   @@map("email_verification_tokens")
+}
+
+// Enums
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  CANCELED
+  EXPIRED
+  PAST_DUE
+}
+
+enum PlanInterval {
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentProviderType {
+  STRIPE
+  BKASH
+  SSLCOMMERZ
+  PIPRAPAY
+}
+
+enum InvoiceStatus {
+  DRAFT
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+// Plan model
+model Plan {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  interval    PlanInterval
+  features    Json?    // JSON array of feature strings
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+// Subscription model
+model Subscription {
+  id                String             @id @default(cuid())
+  userId            String
+  planId            String
+  status            SubscriptionStatus  @default(PENDING)
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean           @default(false)
+  canceledAt         DateTime?
+  providerSubscriptionId String?        // External provider subscription ID
+  providerType       PaymentProviderType?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  // Relations
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan              Plan               @relation(fields: [planId], references: [id])
+  invoices          Invoice[]
+
+  @@index([userId])
+  @@index([planId])
+  @@index([status])
+  @@index([providerSubscriptionId])
+  @@map("subscriptions")
+}
+
+// Invoice model
+model Invoice {
+  id                String          @id @default(cuid())
+  userId            String
+  subscriptionId   String?
+  amount           Decimal          @db.Decimal(10, 2)
+  currency         String           @default("USD")
+  status           InvoiceStatus    @default(DRAFT)
+  providerInvoiceId String?         // External provider invoice ID
+  providerType     PaymentProviderType?
+  paidAt           DateTime?
+  dueDate          DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Relations
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription     Subscription?    @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([subscriptionId])
+  @@index([status])
+  @@index([providerInvoiceId])
+  @@map("invoices")
+}
+
+// PaymentProvider model
+model PaymentProvider {
+  id          String              @id @default(cuid())
+  type        PaymentProviderType @unique
+  enabled     Boolean             @default(false)
+  testMode    Boolean             @default(true)
+  apiKey      String?             // Encrypted in application layer
+  apiSecret   String?             // Encrypted in application layer
+  webhookSecret String?            // Encrypted in application layer
+  config      Json?                // Provider-specific configuration
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@map("payment_providers")
 }

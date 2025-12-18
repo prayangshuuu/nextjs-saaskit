@@ -130,6 +130,55 @@ A production-ready SaaS starter kit built with Next.js, featuring authentication
 - `used` (Boolean)
 - `createdAt` (DateTime)
 
+### Billing Tables
+
+#### `plans`
+- `id` (String, Primary Key)
+- `name` (String)
+- `description` (String, Optional)
+- `price` (Decimal) - Price in specified currency
+- `interval` (Enum: MONTHLY, YEARLY)
+- `features` (JSON, Optional) - Array of feature strings
+- `active` (Boolean) - Whether plan is available for subscription
+- `createdAt`, `updatedAt` (DateTime)
+
+#### `subscriptions`
+- `id` (String, Primary Key)
+- `userId` (String, Foreign Key → users)
+- `planId` (String, Foreign Key → plans)
+- `status` (Enum: PENDING, ACTIVE, CANCELED, EXPIRED, PAST_DUE)
+- `currentPeriodStart` (DateTime, Optional)
+- `currentPeriodEnd` (DateTime, Optional)
+- `cancelAtPeriodEnd` (Boolean) - Cancel at end of billing period
+- `canceledAt` (DateTime, Optional)
+- `providerSubscriptionId` (String, Optional) - External provider subscription ID
+- `providerType` (Enum: STRIPE, BKASH, SSLCOMMERZ, PIPRAPAY, Optional)
+- `createdAt`, `updatedAt` (DateTime)
+
+#### `invoices`
+- `id` (String, Primary Key)
+- `userId` (String, Foreign Key → users)
+- `subscriptionId` (String, Foreign Key → subscriptions, Optional)
+- `amount` (Decimal) - Invoice amount
+- `currency` (String) - Currency code (default: USD)
+- `status` (Enum: DRAFT, PENDING, PAID, FAILED, REFUNDED)
+- `providerInvoiceId` (String, Optional) - External provider invoice ID
+- `providerType` (Enum: STRIPE, BKASH, SSLCOMMERZ, PIPRAPAY, Optional)
+- `paidAt` (DateTime, Optional)
+- `dueDate` (DateTime, Optional)
+- `createdAt`, `updatedAt` (DateTime)
+
+#### `payment_providers`
+- `id` (String, Primary Key)
+- `type` (Enum: STRIPE, BKASH, SSLCOMMERZ, PIPRAPAY, Unique)
+- `enabled` (Boolean) - Whether provider is enabled
+- `testMode` (Boolean) - Test/live mode toggle
+- `apiKey` (String, Optional) - Encrypted API key
+- `apiSecret` (String, Optional) - Encrypted API secret
+- `webhookSecret` (String, Optional) - Encrypted webhook secret
+- `config` (JSON, Optional) - Provider-specific configuration
+- `createdAt`, `updatedAt` (DateTime)
+
 ## 🔌 API Structure
 
 All API routes are versioned under `/api/v1`.

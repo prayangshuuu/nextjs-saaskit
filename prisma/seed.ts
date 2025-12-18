@@ -1,8 +1,38 @@
-import { PrismaClient } from "@prisma/client";
-import { hashPassword } from "../src/lib/auth";
-import { RoleName, PermissionResource, PermissionAction } from "../src/lib/rbac";
+import "dotenv/config";
+const bcrypt = require("bcryptjs");
+
+// Import PrismaClient directly from generated client
+const { PrismaClient } = require("../node_modules/.prisma/client/client");
+
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL environment variable is not set");
+}
 
 const prisma = new PrismaClient();
+
+async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 12);
+}
+
+const RoleName = {
+  ADMIN: "ADMIN",
+  USER: "USER",
+};
+
+const PermissionResource = {
+  USERS: "USERS",
+  SETTINGS: "SETTINGS",
+  BILLING: "BILLING",
+  CRUD: "CRUD",
+};
+
+const PermissionAction = {
+  CREATE: "CREATE",
+  READ: "READ",
+  UPDATE: "UPDATE",
+  DELETE: "DELETE",
+  MANAGE: "MANAGE",
+};
 
 async function main() {
   console.log("🌱 Starting seed...");
@@ -170,4 +200,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

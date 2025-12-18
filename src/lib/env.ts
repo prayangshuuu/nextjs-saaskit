@@ -15,11 +15,11 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
 
   // Email (optional for now)
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.string().optional(),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASSWORD: z.string().optional(),
-  SMTP_FROM: z.string().email().optional(),
+  SMTP_HOST: z.string().optional().or(z.literal("")),
+  SMTP_PORT: z.string().optional().or(z.literal("")),
+  SMTP_USER: z.string().optional().or(z.literal("")),
+  SMTP_PASSWORD: z.string().optional().or(z.literal("")),
+  SMTP_FROM: z.string().email().optional().or(z.literal("")),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -28,7 +28,7 @@ function getEnv(): Env {
   try {
     return envSchema.parse(process.env);
   } catch (error) {
-    if (error instanceof z.ZodError) {
+    if (error instanceof z.ZodError && error.errors) {
       const missingVars = error.errors.map((e) => e.path.join(".")).join(", ");
       throw new Error(
         `Missing or invalid environment variables: ${missingVars}`
