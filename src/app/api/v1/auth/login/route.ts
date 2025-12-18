@@ -38,7 +38,6 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
   // Check if 2FA is enabled
   if (user.twoFactorEnabled) {
-    const body = await request.json().catch(() => ({}));
     const twoFactorToken = body.twoFactorToken;
 
     if (!twoFactorToken) {
