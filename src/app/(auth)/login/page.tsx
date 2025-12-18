@@ -41,7 +41,8 @@ export default function LoginPage() {
       router.push(redirect);
       router.refresh();
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      console.error("Login error:", err);
+      setError(err instanceof Error ? err.message : "An error occurred. Please try again.");
       setLoading(false);
     }
   };
