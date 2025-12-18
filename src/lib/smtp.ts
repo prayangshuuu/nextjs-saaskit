@@ -14,7 +14,7 @@ export interface SmtpConfig {
 }
 
 // Simple encryption/decryption (in production, use proper encryption library)
-function encryptPassword(password: string): string {
+export function encryptPassword(password: string): string {
   // In production, use crypto.createCipheriv or a library like @aws-sdk/client-kms
   // For now, base64 encoding (NOT secure, but better than plain text)
   return Buffer.from(password).toString("base64");

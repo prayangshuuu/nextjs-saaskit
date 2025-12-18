@@ -2,6 +2,7 @@ import { getSmtpConfig, createTransporter } from "./smtp";
 import { getTenantFromRequest } from "./tenant";
 import { NextRequest } from "next/server";
 import { prisma } from "./prisma";
+import { renderEmailTemplate } from "./email-template-renderer";
 
 export interface EmailOptions {
   to: string | string[];

@@ -3,6 +3,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { generateRandomToken } from "@/lib/auth";
 import { apiHandler } from "@/lib/api-guards";
+import { sendTemplateEmail } from "@/lib/email-service";
+import { env } from "@/lib/env";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email(),
@@ -36,10 +38,20 @@ export const POST = apiHandler(async (request: NextRequest) => {
     },
   });
 
-  // Send password reset notification
+  // Send password reset email
   const resetLink = `${env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
-  notifyPasswordReset(user.id, resetLink).catch((error) => {
-    console.error("Failed to send password reset notification:", error);
+  sendTemplateEmail({
+    to: user.email,
+    templateKey: "reset-password",
+    variables: {
+      user: {
+        name: user.name || user.email,
+        email: user.email,
+      },
+      resetLink,
+    },
+  }).catch((error) => {
+    console.error("Failed to send password reset email:", error);
   });
 
   return NextResponse.json({

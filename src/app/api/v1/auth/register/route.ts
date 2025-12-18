@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, createSession, createRefreshToken } from "@/lib/auth";
+import { hashPassword, createSession, createRefreshToken, generateRandomToken } from "@/lib/auth";
 import { generateAccessToken, generateRefreshToken } from "@/lib/jwt";
 import { RoleName } from "@/lib/rbac";
 import { apiHandler } from "@/lib/api-guards";
+import { sendTemplateEmail } from "@/lib/email-service";
+import { env } from "@/lib/env";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -93,9 +95,33 @@ export const POST = apiHandler(async (request: NextRequest) => {
     maxAge: 60 * 60 * 24 * 7, // 7 days
   });
 
-  // Send welcome notification
-  notifyUserRegistered(user.id, user.email, user.name || undefined).catch((error) => {
-    console.error("Failed to send welcome notification:", error);
+  // Generate email verification token
+  const verificationToken = generateRandomToken();
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour expiry
+
+  await prisma.emailVerificationToken.create({
+    data: {
+      userId: user.id,
+      token: verificationToken,
+      expiresAt,
+    },
+  });
+
+  // Send email verification email
+  const verificationLink = `${env.NEXT_PUBLIC_APP_URL}/verify-email?token=${verificationToken}`;
+  sendTemplateEmail({
+    to: user.email,
+    templateKey: "email-verification",
+    variables: {
+      user: {
+        name: user.name || user.email,
+        email: user.email,
+      },
+      verificationLink,
+    },
+  }).catch((error) => {
+    console.error("Failed to send verification email:", error);
   });
 
   return response;
