@@ -30,6 +30,8 @@ model User {
   subscriptions Subscription[]
   invoices      Invoice[]
   apiKeys       ApiKey[]
+  organizationMembers OrganizationMember[]
+  ownedOrganizations Organization[] @relation("OrganizationOwner")
 
   @@map("users")
 }
@@ -172,6 +174,12 @@ enum InvoiceStatus {
   REFUNDED
 }
 
+enum OrganizationRoleType {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
 // Plan model
 model Plan {
   id          String   @id @default(cuid())
@@ -194,6 +202,7 @@ model Plan {
 model Subscription {
   id                String             @id @default(cuid())
   userId            String
+  organizationId   String?            // Multi-tenant: org-level subscriptions
   planId            String
   status            SubscriptionStatus  @default(PENDING)
   currentPeriodStart DateTime?
@@ -207,10 +216,12 @@ model Subscription {
 
   // Relations
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization      Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   plan              Plan               @relation(fields: [planId], references: [id])
   invoices          Invoice[]
 
   @@index([userId])
+  @@index([organizationId])
   @@index([planId])
   @@index([status])
   @@index([providerSubscriptionId])
@@ -221,6 +232,7 @@ model Subscription {
 model Invoice {
   id                String          @id @default(cuid())
   userId            String
+  organizationId   String?          // Multi-tenant: org-level invoices
   subscriptionId   String?
   amount           Decimal          @db.Decimal(10, 2)
   currency         String           @default("USD")
@@ -234,9 +246,11 @@ model Invoice {
 
   // Relations
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization     Organization?   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   subscription     Subscription?    @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
 
   @@index([userId])
+  @@index([organizationId])
   @@index([subscriptionId])
   @@index([status])
   @@index([providerInvoiceId])
@@ -263,6 +277,7 @@ model PaymentProvider {
 model ApiKey {
   id          String   @id @default(cuid())
   userId      String
+  organizationId String? // Multi-tenant: org-scoped API keys
   name        String
   key         String   @unique
   keyHash     String   // Hashed version for verification
@@ -276,8 +291,55 @@ model ApiKey {
 
   // Relations
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([organizationId])
   @@index([key])
   @@map("api_keys")
+}
+
+// Organization model
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  ownerId     String   // User who owns the organization
+  metadata    Json?    // Additional org data
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  owner       User     @relation("OrganizationOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     OrganizationMember[]
+  subscriptions Subscription[]
+  invoices    Invoice[]
+  apiKeys     ApiKey[]
+  usageRecords UsageRecord[]
+  auditLogs   AuditLog[]
+
+  @@index([ownerId])
+  @@index([slug])
+  @@map("organizations")
+}
+
+// OrganizationMember model
+model OrganizationMember {
+  id             String              @id @default(cuid())
+  organizationId String
+  userId         String
+  role           OrganizationRoleType @default(MEMBER)
+  invitedBy      String?             // User who invited this member
+  joinedAt       DateTime            @default(now())
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  // Relations
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+  @@map("organization_members")
 }

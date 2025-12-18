@@ -179,6 +179,32 @@ A production-ready SaaS starter kit built with Next.js, featuring authentication
 - `config` (JSON, Optional) - Provider-specific configuration
 - `createdAt`, `updatedAt` (DateTime)
 
+### Multi-Tenancy Tables
+
+#### `organizations`
+- `id` (String, Primary Key)
+- `name` (String) - Organization name
+- `slug` (String, Unique) - URL-friendly identifier
+- `ownerId` (String, Foreign Key → users) - Organization owner
+- `metadata` (JSON, Optional) - Additional organization data
+- `createdAt`, `updatedAt` (DateTime)
+
+#### `organization_members`
+- `id` (String, Primary Key)
+- `organizationId` (String, Foreign Key → organizations)
+- `userId` (String, Foreign Key → users)
+- `role` (Enum: OWNER, ADMIN, MEMBER) - Member role
+- `invitedBy` (String, Optional) - User who invited this member
+- `joinedAt` (DateTime) - When member joined
+- `createdAt`, `updatedAt` (DateTime)
+- Unique constraint on `[organizationId, userId]`
+
+**Tenant Isolation:**
+- `subscriptions.organizationId` - Links subscriptions to organizations
+- `invoices.organizationId` - Links invoices to organizations
+- `api_keys.organizationId` - Links API keys to organizations
+- Prisma middleware automatically enforces tenant isolation for all queries
+
 ## 🔌 API Structure
 
 All API routes are versioned under `/api/v1`.
