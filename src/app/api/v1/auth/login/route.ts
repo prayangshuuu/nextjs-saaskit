@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { verifyPassword, createSession, createRefreshToken, deleteAllUserSessions } from "@/lib/auth";
 import { generateAccessToken, generateRefreshToken } from "@/lib/jwt";
 import { apiHandler } from "@/lib/api-guards";
+import { decryptSecret, verifyTOTP, useRecoveryCode } from "@/lib/two-factor";
 
 const loginSchema = z.object({
   email: z.string().email(),
