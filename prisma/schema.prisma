@@ -315,8 +315,6 @@ model Organization {
   subscriptions Subscription[]
   invoices    Invoice[]
   apiKeys     ApiKey[]
-  usageRecords UsageRecord[]
-  auditLogs   AuditLog[]
 
   @@index([ownerId])
   @@index([slug])
