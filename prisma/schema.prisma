@@ -525,3 +525,16 @@ model FeatureFlag {
   @@index([enabled])
   @@map("feature_flags")
 }
+
+// TelemetryEvent model for optional, opt-in telemetry
+model TelemetryEvent {
+  id        String   @id @default(cuid())
+  event     String   // Event name (e.g., "feature.used", "error.occurred")
+  metadata  Json?    // Event metadata (no PII)
+  version   String?  // App version
+  timestamp DateTime @default(now())
+
+  @@index([event])
+  @@index([timestamp])
+  @@map("telemetry_events")
+}
