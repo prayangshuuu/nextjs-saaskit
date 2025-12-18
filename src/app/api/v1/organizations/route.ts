@@ -56,7 +56,12 @@ export const POST = apiHandler(async (request: NextRequest) => {
   });
 
   return NextResponse.json({ organization }, { status: 201 });
-});
+  },
+  {
+    action: "organization.created",
+    entity: "Organization",
+  }
+);
 
 export const GET = apiHandler(async (request: NextRequest) => {
   const user = await requireAuth(request);

@@ -97,7 +97,8 @@ export const PUT = apiHandler(async (
   return NextResponse.json({ organization });
 });
 
-export const DELETE = apiHandler(async (
+export const DELETE = apiHandler(
+  async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) => {
@@ -110,5 +111,10 @@ export const DELETE = apiHandler(async (
   });
 
   return NextResponse.json({ message: "Organization deleted successfully" });
-});
+  },
+  {
+    action: "organization.deleted",
+    entity: "Organization",
+  }
+);
 

@@ -59,17 +59,70 @@ export async function requirePermission(
   }
 }
 
-// API error handler wrapper with tenant context and usage tracking
+// API error handler wrapper with tenant context, usage tracking, and audit logging
 export function apiHandler(
-  handler: (request: NextRequest) => Promise<NextResponse>
+  handler: (request: NextRequest) => Promise<NextResponse>,
+  auditConfig?: {
+    action: string;
+    entity: string;
+    skipLogging?: boolean;
+  }
 ) {
   return withUsageTracking(async (request: NextRequest): Promise<NextResponse> => {
+    let user: { userId: string; email: string; roleId: string } | null = null;
+    let response: NextResponse;
+
     try {
       // Set tenant context from request
       const tenantId = getTenantFromRequest(request);
       setTenantContext(tenantId);
 
-      const response = await handler(request);
+      // Get user for audit logging
+      try {
+        user = await getAuthenticatedUser(request);
+      } catch {
+        // User not authenticated, skip audit logging
+      }
+
+      response = await handler(request);
+
+      // Audit log successful actions
+      if (
+        user &&
+        auditConfig &&
+        !auditConfig.skipLogging &&
+        response.status < 400
+      ) {
+        const { ipAddress, userAgent } = getClientInfo(request);
+        const tenantId = getTenantFromRequest(request);
+
+        // Extract entity ID from response if available
+        let entityId: string | undefined;
+        try {
+          const responseData = await response.clone().json();
+          if (responseData.user?.id) entityId = responseData.user.id;
+          if (responseData.organization?.id) entityId = responseData.organization.id;
+          if (responseData.plan?.id) entityId = responseData.plan.id;
+          if (responseData.subscription?.id) entityId = responseData.subscription.id;
+        } catch {
+          // Response might not be JSON, ignore
+        }
+
+        await createAuditLog({
+          actorId: user.userId,
+          organizationId: tenantId,
+          action: auditConfig.action,
+          entity: auditConfig.entity,
+          entityId,
+          metadata: maskSensitiveData({
+            method: request.method,
+            path: request.nextUrl.pathname,
+            statusCode: response.status,
+          }),
+          ipAddress: ipAddress || undefined,
+          userAgent: userAgent || undefined,
+        });
+      }
 
       // Clear tenant context after request
       setTenantContext(null);
@@ -78,6 +131,26 @@ export function apiHandler(
     } catch (error) {
       // Clear tenant context on error
       setTenantContext(null);
+
+      // Audit log failed actions
+      if (user && auditConfig && !auditConfig.skipLogging) {
+        const { ipAddress, userAgent } = getClientInfo(request);
+        const tenantId = getTenantFromRequest(request);
+
+        await createAuditLog({
+          actorId: user.userId,
+          organizationId: tenantId,
+          action: `${auditConfig.action}.failed`,
+          entity: auditConfig.entity,
+          metadata: maskSensitiveData({
+            method: request.method,
+            path: request.nextUrl.pathname,
+            error: error instanceof Error ? error.message : "Unknown error",
+          }),
+          ipAddress: ipAddress || undefined,
+          userAgent: userAgent || undefined,
+        });
+      }
 
       if (error instanceof Error) {
         if (error.message === "Unauthorized") {
