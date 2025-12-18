@@ -37,7 +37,7 @@ export function Footer() {
           <p>{branding.footerText}</p>
         ) : (
           shouldShowAttribution && (
-            <p>Powered by <a href="https://github.com/your-org/nextjs-saaskit" className="hover:underline" target="_blank" rel="noopener noreferrer">SaaS Kit</a></p>
+            <p>Built with <a href="https://github.com/prayangshuuu/nextjs-saaskit" className="hover:underline" target="_blank" rel="noopener noreferrer">nextjs-saaskit</a></p>
           )
         )}
       </div>
