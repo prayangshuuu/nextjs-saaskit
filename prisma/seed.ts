@@ -143,26 +143,34 @@ async function main() {
   ];
 
   for (const module of defaultModules) {
-    await prisma.systemModule.upsert({
+    // Check if module exists (using findFirst since unique constraint with null is tricky)
+    const existing = await prisma.systemModule.findFirst({
       where: {
-        organizationId_key: {
-          organizationId: null,
-          key: module.key,
-        },
-      },
-      update: {
-        enabled: module.enabled,
-        description: module.description,
-        scope: module.scope,
-      },
-      create: {
         key: module.key,
-        enabled: module.enabled,
-        description: module.description,
-        scope: module.scope,
-        organizationId: null, // Global modules
+        organizationId: null,
       },
     });
+
+    if (existing) {
+      await prisma.systemModule.update({
+        where: { id: existing.id },
+        data: {
+          enabled: module.enabled,
+          description: module.description,
+          scope: module.scope,
+        },
+      });
+    } else {
+      await prisma.systemModule.create({
+        data: {
+          key: module.key,
+          enabled: module.enabled,
+          description: module.description,
+          scope: module.scope,
+          organizationId: null, // Global modules
+        },
+      });
+    }
   }
   console.log("✅ System modules created");
 
