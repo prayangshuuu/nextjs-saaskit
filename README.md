@@ -659,12 +659,48 @@ This software is open source and free to use for any purpose, including commerci
 
 ## 🤝 Contributing
 
-This is a starter kit. Feel free to fork and customize for your needs.
+We welcome contributions! This is an open-source project under the MIT License.
+
+### How to Contribute
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Contribution Guidelines
+
+- Follow the existing code style
+- Write clear commit messages
+- Add tests for new features
+- Update documentation as needed
+- Ensure all tests pass
+
+### Open Source Philosophy
+
+- **Free Forever**: The open-source version will always remain free
+- **No Restrictions**: No features are restricted in the OSS version
+- **Transparency**: All code is open and auditable
+- **Community First**: Community contributions are welcome and valued
 
 ## 📧 Support
 
-For issues and questions, please open an issue in the repository.
+### Community Support
+
+For issues, questions, and discussions:
+- Open an issue in the repository
+- Check existing issues and discussions
+- Review the documentation
+
+### Commercial Support
+
+For priority support, custom development, or hosted solutions:
+- See [COMMERCIAL.md](COMMERCIAL.md) for details
+- Contact: [support@example.com]
 
 ---
 
 **Built with ❤️ using Next.js**
+
+**License**: MIT License - See [LICENSE](LICENSE) for details
