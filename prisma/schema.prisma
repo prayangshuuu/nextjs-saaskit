@@ -396,6 +396,7 @@ model Organization {
   notifications Notification[]
   systemSettings SystemSetting[]
   featureFlags FeatureFlag[]
+  fileUploads   FileUpload[]
 
   @@index([ownerId])
   @@index([slug])
