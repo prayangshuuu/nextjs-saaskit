@@ -4,6 +4,165 @@ A production-ready, **100% free and open-source** SaaS starter kit built with Ne
 
 **License**: MIT License - Free to use for any purpose, including commercial use.
 
+## 🧠 LLM Project Context (Read This First)
+
+**nextjs-saaskit** is a production-ready, 100% free and open-source SaaS starter kit built with Next.js 16, TypeScript, Prisma, and PostgreSQL. It provides a complete foundation for building multi-tenant SaaS applications with authentication, billing, role-based access control, email services, and admin dashboards. The project is designed to be immediately usable while remaining fully customizable, with no vendor lock-in, no telemetry, and no monetization features.
+
+**Core Goals:**
+- Provide a complete, production-ready SaaS foundation that developers can deploy immediately
+- Maintain 100% open-source status with MIT licensing (no paywalls, no restrictions)
+- Ensure security-first design with proper authentication, authorization, and data isolation
+- Support multi-tenancy with organization-based tenant isolation
+- Enable rapid development through comprehensive admin tooling and developer experience features
+
+**Tech Stack Overview:**
+- **Frontend**: Next.js 16 App Router, React 19, TypeScript, Tailwind CSS v4, shadcn/ui components
+- **Backend**: Next.js API Routes (REST API v1), JWT authentication, Prisma ORM
+- **Database**: PostgreSQL with Prisma migrations
+- **Key Libraries**: bcryptjs (password hashing), jsonwebtoken (auth), nodemailer (email), speakeasy (2FA), qrcode (2FA QR codes)
+
+**High-Level Architecture:**
+- **Frontend**: App Router with route groups for auth and dashboard, server and client components, theme support
+- **Backend**: RESTful API under `/api/v1` with versioning, middleware-based route protection, centralized error handling
+- **Database**: PostgreSQL with Prisma ORM, multi-tenant data isolation via middleware, comprehensive audit logging
+- **Email**: Provider-agnostic email service with SMTP configuration, template system, org-level overrides
+- **Billing**: Stripe integration with webhooks, subscription management, invoice generation, multiple payment provider support
+
+**Key Design Constraints:**
+- **Open Source First**: No monetization logic, no telemetry, no license enforcement in code
+- **Security First**: JWT with refresh tokens, HTTP-only cookies, CSRF protection, rate limiting, tenant isolation
+- **Multi-Tenancy**: Organization-based isolation with Prisma middleware enforcing data boundaries
+- **RBAC**: Role-based access control with granular permissions, API and UI guards
+- **Maintainer-Led**: Project direction guided by maintainer with community input
+
+**Important Warning:**
+If you do not have full repository context (e.g., you're reading only the README or a single file), do not propose large refactors or architectural changes. The codebase has specific patterns, middleware configurations, and design decisions that may not be apparent from limited context. Instead, ask questions or request clarification before suggesting significant modifications.
+
+## 🤖 Coding Agent Instructions (Cursor / Copilot / AI Agents)
+
+**You have full repository context.** These instructions govern your behavior when making changes to this codebase.
+
+### Architecture Preservation Rules
+
+- **DO NOT** modify the folder structure without explicit user request
+- **DO NOT** change API versioning (`/api/v1`) or introduce breaking changes
+- **DO NOT** refactor core authentication or authorization logic without approval
+- **DO NOT** modify Prisma schema without understanding all dependent code
+- **DO NOT** change multi-tenancy isolation patterns (Prisma middleware)
+- **DO NOT** alter RBAC permission system structure
+
+### Database & Prisma Rules
+
+- **DO NOT** run `prisma db push --force-reset` or reset migrations
+- **DO NOT** delete or rename existing Prisma models without checking all relations
+- **DO NOT** modify tenant isolation middleware in `src/lib/prisma.ts`
+- **DO** use `prisma db push` for development schema changes
+- **DO** create proper migrations for production changes
+- **DO** verify foreign key relationships before schema changes
+
+### Authentication & Security Rules
+
+- **DO NOT** modify JWT token generation or validation logic without security review
+- **DO NOT** change password hashing algorithm (bcrypt) or salt rounds
+- **DO NOT** remove or weaken security middleware or guards
+- **DO NOT** expose sensitive data in API responses or logs
+- **DO** maintain HTTP-only cookies for token storage
+- **DO** preserve CSRF protection mechanisms
+- **DO** maintain rate limiting on authentication endpoints
+
+### API Versioning Rules
+
+- **DO NOT** modify existing `/api/v1` endpoints in breaking ways
+- **DO NOT** remove or rename API routes without deprecation notice
+- **DO** add new endpoints following existing patterns
+- **DO** maintain consistent error response formats
+- **DO** use `apiHandler` wrapper for all API routes
+- **DO** include proper authentication/authorization checks
+
+### Multi-Tenancy Safety Rules
+
+- **DO NOT** bypass tenant isolation middleware
+- **DO NOT** query data without organization context where required
+- **DO NOT** expose cross-tenant data in API responses
+- **DO** use `getTenantFromRequest` for organization context
+- **DO** verify tenant isolation in all data queries
+- **DO** test multi-tenant scenarios when modifying data access
+
+### RBAC Safety Rules
+
+- **DO NOT** modify permission checking logic without understanding impact
+- **DO NOT** grant admin access without proper checks
+- **DO NOT** bypass `requireAdmin` or `requirePermission` guards
+- **DO** verify permissions before allowing data access
+- **DO** maintain consistency between API guards and UI guards
+
+### Email & Billing Safety Rules
+
+- **DO NOT** modify email sending logic without testing SMTP fallback
+- **DO NOT** change billing calculation or subscription logic without verification
+- **DO NOT** modify Stripe webhook handling without testing
+- **DO** preserve org-level SMTP override functionality
+- **DO** maintain email template variable interpolation
+- **DO** verify payment provider configurations before changes
+
+### Testing & Developer Experience Rules
+
+- **DO NOT** remove or disable existing tests
+- **DO NOT** modify CI/CD workflows without understanding impact
+- **DO NOT** change Docker configuration without testing
+- **DO** add tests for new features
+- **DO** maintain test coverage for critical paths
+- **DO** ensure tests pass before committing
+
+### Commit Discipline Rules
+
+- **DO** make one logical change per commit
+- **DO** use conventional commit messages: `feat:`, `fix:`, `docs:`, `chore:`, `test:`
+- **DO** update README.md when adding features or changing behavior
+- **DO NOT** combine unrelated changes in a single commit
+- **DO NOT** commit with generic messages like "update" or "fix"
+- **DO NOT** skip commits or merge multiple tasks
+
+### Explicitly Forbidden Actions
+
+- **FORBIDDEN**: Running `prisma migrate reset` or destructive database operations
+- **FORBIDDEN**: Changing API versioning from `/api/v1` without deprecation
+- **FORBIDDEN**: Removing or weakening security features
+- **FORBIDDEN**: Breaking multi-tenant data isolation
+- **FORBIDDEN**: Silent refactoring of core systems without approval
+- **FORBIDDEN**: Swapping major dependencies without user approval
+- **FORBIDDEN**: Modifying authentication flow without security review
+- **FORBIDDEN**: Removing audit logging or compliance features
+
+### Error Handling Expectations
+
+- **DO** use `apiHandler` wrapper for consistent error handling
+- **DO** return appropriate HTTP status codes (400, 401, 403, 404, 500)
+- **DO** log errors appropriately without exposing sensitive data
+- **DO** provide clear error messages for validation failures
+- **DO NOT** expose internal errors or stack traces in production responses
+
+### README Update Rules
+
+- **DO** update README.md when:
+  - Adding new features or capabilities
+  - Changing API endpoints or behavior
+  - Modifying setup or deployment instructions
+  - Adding new environment variables
+  - Changing database schema significantly
+- **DO NOT** update README.md for:
+  - Internal code refactoring (unless behavior changes)
+  - Bug fixes that don't change documented behavior
+  - Test-only changes
+
+### When in Doubt
+
+- **ASK** before making architectural changes
+- **VERIFY** impact on multi-tenancy and security
+- **TEST** changes thoroughly before committing
+- **PRESERVE** existing patterns and conventions
+- **DOCUMENT** significant changes in README or code comments
+
 ## 🚀 Features
 
 ### Core Features
