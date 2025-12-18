@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyAccessToken } from "./lib/jwt";
 import { getTenantFromRequest, setTenantContext } from "./lib/tenant";
+import { checkApiModuleAccess, checkPageModuleAccess } from "./lib/module-enforcement";
 
 // Public routes that don't require authentication
 const publicRoutes = [
@@ -29,6 +30,27 @@ export async function middleware(request: NextRequest) {
   // Set tenant context from request (for Prisma middleware)
   const tenantId = getTenantFromRequest(request);
   setTenantContext(tenantId);
+
+  // MODULE ENFORCEMENT: Check if route is blocked by module state
+  // This is the FIRST check - modules can disable entire features
+  
+  // Check API routes for module access
+  if (pathname.startsWith("/api/")) {
+    const moduleBlock = await checkApiModuleAccess(request);
+    if (moduleBlock) {
+      clearTenantContext();
+      return moduleBlock;
+    }
+  }
+
+  // Check page routes for module access
+  if (!pathname.startsWith("/api/") && !pathname.startsWith("/_next/")) {
+    const moduleBlock = await checkPageModuleAccess(request);
+    if (moduleBlock) {
+      clearTenantContext();
+      return moduleBlock;
+    }
+  }
 
   // Note: Maintenance mode check happens in API handlers due to Edge runtime limitations
   // Full maintenance mode enforcement with admin bypass is handled in apiHandler

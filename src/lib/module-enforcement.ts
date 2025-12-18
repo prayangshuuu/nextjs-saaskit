@@ -148,12 +148,12 @@ export async function checkApiModuleAccess(
 
 /**
  * Check if page route should be blocked based on module state
- * Returns redirect URL or null if access allowed
+ * Returns NextResponse (redirect or 404) or null if access allowed
  */
 export async function checkPageModuleAccess(
-  pathname: string,
-  organizationId?: string | null
-): Promise<string | null> {
+  request: NextRequest
+): Promise<NextResponse | null> {
+  const pathname = request.nextUrl.pathname;
   const moduleKey = getModuleForPageRoute(pathname);
   
   // No module mapping = allow (backwards compatibility)
@@ -161,34 +161,36 @@ export async function checkPageModuleAccess(
     return null;
   }
   
+  // Get user context for scope checks
+  const user = await getAuthenticatedUser(request);
+  const tenantId = getTenantFromRequest(request);
+  
   // Admin pages bypass module checks (admin can always access)
   if (moduleKey === "admin" || pathname.startsWith("/dashboard/admin")) {
-    // Admin check happens at page level
-    return null;
+    if (user) {
+      const admin = await isAdmin(user.userId);
+      if (admin) {
+        return null; // Admin can always access admin pages
+      }
+    }
   }
   
-  // Check if module is enabled
-  const enabled = await isModuleEnabled(moduleKey, { organizationId });
+  // Check if module is enabled with proper context
+  const enabled = await isModuleEnabled(moduleKey, {
+    userId: user?.userId,
+    organizationId: tenantId,
+    isAdmin: user ? await isAdmin(user.userId) : false,
+  });
   
   if (!enabled) {
-    // Return redirect path based on module type
-    if (moduleKey === "landing") {
-      return "/coming-soon";
+    // Return 404 for public pages, redirect for authenticated pages
+    if (user) {
+      // Authenticated user - redirect to home
+      return NextResponse.redirect(new URL("/", request.url));
+    } else {
+      // Public page - return 404
+      return NextResponse.rewrite(new URL("/404", request.url));
     }
-    
-    if (moduleKey === "auth") {
-      // Auth disabled - redirect to landing or coming soon
-      const landingEnabled = await isModuleEnabled("landing", { organizationId });
-      return landingEnabled ? "/" : "/coming-soon";
-    }
-    
-    if (moduleKey === "dashboard") {
-      // Dashboard disabled - redirect to home
-      return "/";
-    }
-    
-    // Default: redirect to home
-    return "/";
   }
   
   return null; // Module enabled, allow access
