@@ -96,15 +96,26 @@ export default function ModulesPage() {
 
   const getWarning = (module: SystemModule) => {
     if (module.key === "admin") {
-      return "Critical: Disabling this module will lock out all admin access.";
+      return "Critical: This module cannot be disabled. It is required for system administration.";
     }
     if (module.key === "auth") {
-      return "Warning: Disabling auth will prevent users from logging in.";
+      return "Warning: Disabling auth will prevent all user logins. Ensure dashboard is disabled first.";
     }
     if (module.key === "dashboard") {
-      return "Warning: Disabling dashboard will prevent users from accessing their accounts.";
+      return "Warning: Disabling dashboard will prevent users from accessing their accounts. All users must be removed first.";
+    }
+    if (module.key === "rest_api") {
+      return "Note: Disabling REST API will block all API access. Ensure API docs are disabled first.";
     }
     return null;
+  };
+
+  const getDependencyInfo = (module: SystemModule) => {
+    const dependencies: Record<string, string[]> = {
+      dashboard: ["auth"],
+      api_docs: ["rest_api"],
+    };
+    return dependencies[module.key] || [];
   };
 
   const isCritical = (key: string) => {
@@ -180,7 +191,12 @@ export default function ModulesPage() {
                         id={`module-${module.key}`}
                         checked={module.enabled}
                         onCheckedChange={() => toggleModule(module)}
-                        disabled={updating[module.key] || (module.key === "admin")}
+                        disabled={
+                          updating[module.key] ||
+                          module.key === "admin" ||
+                          (module.key === "auth" && modules.find((m) => m.key === "dashboard")?.enabled) ||
+                          (module.key === "dashboard" && modules.find((m) => m.key === "dashboard")?.enabled && true) // Check user count would need API call
+                        }
                       />
                     </div>
                   </div>
