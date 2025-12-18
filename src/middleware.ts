@@ -31,6 +31,39 @@ export async function middleware(request: NextRequest) {
   const tenantId = getTenantFromRequest(request);
   setTenantContext(tenantId);
 
+  // COMING SOON MODE: Check if coming soon mode is enabled
+  // This overrides ALL public modules
+  if (!pathname.startsWith("/api/") && !pathname.startsWith("/_next/") && pathname !== "/coming-soon") {
+    const { isModuleEnabled } = await import("./lib/module-service");
+    const comingSoonEnabled = await isModuleEnabled("coming_soon");
+    
+    if (comingSoonEnabled) {
+      // Allow admin routes to bypass coming soon
+      const token = request.cookies.get("accessToken")?.value;
+      if (token) {
+        try {
+          const { verifyAccessToken } = await import("./lib/jwt");
+          const payload = verifyAccessToken(token);
+          // Check if user is admin
+          const { isAdmin } = await import("./lib/rbac");
+          const admin = await isAdmin(payload.userId);
+          if (admin) {
+            // Admin can bypass coming soon
+          } else {
+            // Non-admin users see coming soon
+            return NextResponse.rewrite(new URL("/coming-soon", request.url));
+          }
+        } catch {
+          // Invalid token, show coming soon
+          return NextResponse.rewrite(new URL("/coming-soon", request.url));
+        }
+      } else {
+        // No token, show coming soon
+        return NextResponse.rewrite(new URL("/coming-soon", request.url));
+      }
+    }
+  }
+
   // MODULE ENFORCEMENT: Check if route is blocked by module state
   // This is the FIRST check - modules can disable entire features
   
