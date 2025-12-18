@@ -93,6 +93,11 @@ export const POST = apiHandler(async (request: NextRequest) => {
     maxAge: 60 * 60 * 24 * 7, // 7 days
   });
 
+  // Send welcome notification
+  notifyUserRegistered(user.id, user.email, user.name || undefined).catch((error) => {
+    console.error("Failed to send welcome notification:", error);
+  });
+
   return response;
 });
 

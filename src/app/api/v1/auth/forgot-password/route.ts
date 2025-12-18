@@ -36,9 +36,11 @@ export const POST = apiHandler(async (request: NextRequest) => {
     },
   });
 
-  // TODO: Send email with reset link
-  // For now, we'll just return success
-  // In production, send email with link: ${NEXT_PUBLIC_APP_URL}/reset-password?token=${token}
+  // Send password reset notification
+  const resetLink = `${env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+  notifyPasswordReset(user.id, resetLink).catch((error) => {
+    console.error("Failed to send password reset notification:", error);
+  });
 
   return NextResponse.json({
     message: "If an account exists, a password reset email has been sent.",
