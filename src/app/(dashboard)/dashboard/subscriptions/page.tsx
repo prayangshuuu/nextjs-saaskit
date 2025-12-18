@@ -113,7 +113,27 @@ export default function SubscriptionsPage() {
   };
 
   if (loading) {
-    return <div className="p-6">Loading...</div>;
+    return (
+      <div className="space-y-6">
+        <div>
+          <Skeleton className="h-9 w-64 mb-2" />
+          <Skeleton className="h-5 w-48" />
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="border rounded-lg p-6 space-y-4">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
