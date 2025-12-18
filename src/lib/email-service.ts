@@ -12,6 +12,13 @@ export interface EmailOptions {
   fromName?: string;
 }
 
+export interface TemplateEmailOptions {
+  to: string | string[];
+  templateKey: string;
+  variables: TemplateVariables;
+  organizationId?: string | null;
+}
+
 export interface EmailResult {
   success: boolean;
   messageId?: string;
@@ -140,6 +147,34 @@ export async function sendEmail(
   return {
     success: true,
   };
+}
+
+// Send email using template
+export async function sendTemplateEmail(
+  options: TemplateEmailOptions
+): Promise<EmailResult> {
+  const rendered = await renderEmailTemplate(
+    options.templateKey,
+    options.variables,
+    options.organizationId
+  );
+
+  if (!rendered) {
+    return {
+      success: false,
+      error: `Template '${options.templateKey}' not found`,
+    };
+  }
+
+  return sendEmail(
+    {
+      to: options.to,
+      subject: rendered.subject,
+      html: rendered.html,
+      text: rendered.text,
+    },
+    options.organizationId
+  );
 }
 
 export async function sendEmailSync(
