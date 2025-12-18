@@ -670,25 +670,25 @@ nextjs-saaskit/
 - [x] **Admin Dashboard**
   - [x] Plans management UI
   - [x] Payment provider configuration UI
-  - [ ] User management UI
-  - [ ] Role and permission management UI
-  - [ ] Analytics and reporting
-- [ ] **Email Service**
-  - SMTP integration
-  - Email templates
-  - Email verification emails
-  - Password reset emails
-- [ ] **Advanced Features**
-  - Two-factor authentication (2FA)
-  - Social login (OAuth)
+  - [x] User management UI
+  - [x] Role and permission management UI
+  - [x] Analytics and reporting
+- [x] **Email Service**
+  - [x] SMTP integration
+  - [x] Email templates
+  - [x] Email verification emails
+  - [x] Password reset emails
+- [x] **Advanced Features**
+  - [x] Two-factor authentication (2FA)
+  - [x] Social login (OAuth)
   - [x] API rate limiting
-  - File uploads
+  - [x] File uploads
   - [x] Webhooks (Stripe)
 - [x] **Developer Experience**
   - [x] API documentation (Swagger/OpenAPI)
-  - Testing suite (Jest/Vitest)
-  - CI/CD pipeline
-  - Docker support
+  - [x] Testing suite (Vitest)
+  - [x] CI/CD pipeline
+  - [x] Docker support
 
 ## 📝 License
 
