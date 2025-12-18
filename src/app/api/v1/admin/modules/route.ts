@@ -14,9 +14,8 @@ const updateModuleSchema = z.object({
 // Get all modules
 export const GET = apiHandler(async (request: NextRequest) => {
   await requireAdmin(request);
-  const organizationId = getTenantFromRequest(request);
 
-  const modules = await getAllModules(organizationId);
+  const modules = await getAllModules();
 
   return NextResponse.json({ modules });
 });
@@ -78,16 +77,23 @@ export const PUT = apiHandler(
           );
         }
       }
+
+      // Cannot disable auth if dashboard is enabled (already checked above, but ensure consistency)
+      if (data.key === "auth") {
+        const { isModuleEnabled } = await import("@/lib/module-service");
+        const dashboardEnabled = await isModuleEnabled("dashboard");
+        if (dashboardEnabled) {
+          return NextResponse.json(
+            { error: "Cannot disable auth module while dashboard is enabled. Users need authentication to access the dashboard." },
+            { status: 400 }
+          );
+        }
+      }
     }
 
     const updated = await updateModule(
       data.key,
-      {
-        enabled: data.enabled,
-        description: data.description,
-        scope: data.scope,
-      },
-      organizationId,
+      data.enabled ?? true,
       user?.userId
     );
 
