@@ -12,6 +12,7 @@ export interface BrandingConfig {
   font: string;
   hidePoweredBy: boolean;
   footerText: string;
+  showAttribution: boolean;
 }
 
 export async function getBrandingConfig(
@@ -27,6 +28,7 @@ export async function getBrandingConfig(
     font: await getStringSetting("brand.font", "Inter", organizationId),
     hidePoweredBy: await getBooleanSetting("whiteLabel.hidePoweredBy", false, organizationId),
     footerText: await getStringSetting("whiteLabel.footerText", "", organizationId),
+    showAttribution: await getBooleanSetting("branding.showAttribution", true, organizationId),
   };
 }
 

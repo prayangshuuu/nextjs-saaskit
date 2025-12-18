@@ -161,10 +161,13 @@ export async function renderEmailTemplate(
     : renderTextTemplate(template.htmlBody, finalVariables);
 
   // Add email footer branding
-  if (!branding.hidePoweredBy || branding.footerText) {
-    const footer = branding.footerText || "Powered by SaaS Kit";
-    html += `<div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 0.875rem;">${footer}</div>`;
-    text += `\n\n---\n${footer}`;
+  const shouldShowAttribution = branding.showAttribution && !branding.hidePoweredBy;
+  if (branding.footerText || shouldShowAttribution) {
+    const footer = branding.footerText || (shouldShowAttribution ? "Powered by SaaS Kit" : "");
+    if (footer) {
+      html += `<div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 0.875rem;">${footer}</div>`;
+      text += `\n\n---\n${footer}`;
+    }
   }
 
   return {

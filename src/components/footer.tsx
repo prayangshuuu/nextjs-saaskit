@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getBrandingConfig } from "@/lib/branding";
 
 export function Footer() {
-  const [branding, setBranding] = useState<{ hidePoweredBy: boolean; footerText: string } | null>(null);
+  const [branding, setBranding] = useState<{ hidePoweredBy: boolean; footerText: string; showAttribution: boolean } | null>(null);
 
   useEffect(() => {
     fetchBranding();
@@ -18,6 +18,7 @@ export function Footer() {
         setBranding({
           hidePoweredBy: data.branding.hidePoweredBy,
           footerText: data.branding.footerText,
+          showAttribution: data.branding.showAttribution ?? true,
         });
       }
     } catch (error) {
@@ -27,14 +28,16 @@ export function Footer() {
 
   if (!branding) return null;
 
+  const shouldShowAttribution = branding.showAttribution && !branding.hidePoweredBy;
+
   return (
     <footer className="border-t py-6 mt-auto">
       <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
         {branding.footerText ? (
           <p>{branding.footerText}</p>
         ) : (
-          !branding.hidePoweredBy && (
-            <p>Powered by SaaS Kit</p>
+          shouldShowAttribution && (
+            <p>Powered by <a href="https://github.com/your-org/nextjs-saaskit" className="hover:underline" target="_blank" rel="noopener noreferrer">SaaS Kit</a></p>
           )
         )}
       </div>

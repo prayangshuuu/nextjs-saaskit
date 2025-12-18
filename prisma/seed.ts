@@ -330,6 +330,12 @@ async function main() {
       type: "string",
       description: "Custom footer text",
     },
+    {
+      key: "branding.showAttribution",
+      value: true,
+      type: "boolean",
+      description: "Show attribution to SaaS Kit (default: true)",
+    },
   ];
 
   for (const setting of brandingSettings) {
