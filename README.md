@@ -689,6 +689,45 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
 - **Community First**: Community contributions are welcome and valued
 - **Maintainer-Led**: Project direction guided by maintainer with community input
 
+## 🔒 Security
+
+### Security Features
+
+- JWT-based authentication with refresh tokens
+- Password hashing with bcrypt
+- HTTP-only cookies
+- CSRF protection
+- SQL injection prevention (Prisma ORM)
+- XSS protection
+- Rate limiting on API routes
+- Tenant isolation for multi-tenant data
+- Encrypted sensitive data storage
+- Audit logs for compliance
+
+### Security Policy
+
+We take security seriously. If you discover a security vulnerability:
+
+1. **Do not** open a public issue
+2. Email security concerns to: [security@example.com]
+3. Provide detailed information about the vulnerability
+4. Allow time for the issue to be addressed before disclosure
+
+### Responsible Disclosure
+
+We encourage responsible disclosure of security vulnerabilities:
+- Report privately first
+- Give maintainers time to fix the issue
+- Work together on a coordinated disclosure
+- We appreciate your help in keeping the project secure
+
+### Dependency Security
+
+- All dependencies are open-source and regularly updated
+- Dependencies are reviewed for security vulnerabilities
+- Use `npm audit` to check for known vulnerabilities
+- Keep dependencies up to date
+
 ## 📧 Support
 
 ### Community Support
@@ -698,14 +737,10 @@ For issues, questions, and discussions:
 - Check existing issues and discussions
 - Review the documentation
 
-### Commercial Support
-
-For priority support, custom development, or hosted solutions:
-- See [COMMERCIAL.md](COMMERCIAL.md) for details
-- Contact: [support@example.com]
-
 ---
 
 **Built with ❤️ using Next.js**
 
 **License**: MIT License - See [LICENSE](LICENSE) for details
+
+**Copyright (c) 2025 Prayangshu Biswas**
