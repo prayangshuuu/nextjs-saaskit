@@ -8,6 +8,14 @@ export const metadata: Metadata = {
   title: "SaaS Kit - Build Your SaaS Faster",
   description: "Production-ready SaaS starter kit with authentication, billing, multi-tenancy, and everything you need to launch.",
   keywords: ["SaaS", "starter kit", "Next.js", "TypeScript", "multi-tenant"],
+  openGraph: {
+    title: "SaaS Kit - Build Your SaaS Faster",
+    description: "Production-ready SaaS starter kit with authentication, billing, multi-tenancy, and everything you need to launch.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function HomePage() {
