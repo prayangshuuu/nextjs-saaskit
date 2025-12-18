@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { getBrandingConfig } from "./branding";
 
 export interface TemplateVariables {
   [key: string]: any;
@@ -136,12 +137,40 @@ export async function renderEmailTemplate(
     return null;
   }
 
+  // Add branding variables
+  const branding = await getBrandingConfig(organizationId);
+  const brandingVariables: TemplateVariables = {
+    app: {
+      name: branding.appName,
+      logo: branding.logo,
+    },
+    whiteLabel: {
+      hidePoweredBy: branding.hidePoweredBy,
+      footerText: branding.footerText,
+    },
+  };
+
+  const finalVariables = {
+    ...variables,
+    ...brandingVariables,
+  };
+
+  let html = renderHtmlTemplate(template.htmlBody, finalVariables);
+  let text = template.textBody
+    ? renderTextTemplate(template.textBody, finalVariables)
+    : renderTextTemplate(template.htmlBody, finalVariables);
+
+  // Add email footer branding
+  if (!branding.hidePoweredBy || branding.footerText) {
+    const footer = branding.footerText || "Powered by SaaS Kit";
+    html += `<div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 0.875rem;">${footer}</div>`;
+    text += `\n\n---\n${footer}`;
+  }
+
   return {
-    subject: renderTextTemplate(template.subject, variables),
-    html: renderHtmlTemplate(template.htmlBody, variables),
-    text: template.textBody
-      ? renderTextTemplate(template.textBody, variables)
-      : renderTextTemplate(template.htmlBody, variables), // Fallback to HTML stripped
+    subject: renderTextTemplate(template.subject, finalVariables),
+    html,
+    text,
   };
 }
 
