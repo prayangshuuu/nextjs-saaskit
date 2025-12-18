@@ -1,6 +1,8 @@
 # Next.js SaaS Kit
 
-A production-ready SaaS starter kit built with Next.js, featuring authentication, role-based access control (RBAC), and a scalable architecture.
+A production-ready, **100% free and open-source** SaaS starter kit built with Next.js. Features authentication, billing, multi-tenancy, and everything you need to launch your SaaS product.
+
+**License**: MIT License - Free to use for any purpose, including commercial use.
 
 ## 🚀 Features
 
