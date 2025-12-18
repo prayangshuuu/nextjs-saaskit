@@ -20,6 +20,12 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional().or(z.literal("")),
   SMTP_PASSWORD: z.string().optional().or(z.literal("")),
   SMTP_FROM: z.string().email().optional().or(z.literal("")),
+
+  // OAuth (optional)
+  GOOGLE_CLIENT_ID: z.string().optional().or(z.literal("")),
+  GOOGLE_CLIENT_SECRET: z.string().optional().or(z.literal("")),
+  GITHUB_CLIENT_ID: z.string().optional().or(z.literal("")),
+  GITHUB_CLIENT_SECRET: z.string().optional().or(z.literal("")),
 });
 
 export type Env = z.infer<typeof envSchema>;
