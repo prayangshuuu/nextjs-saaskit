@@ -35,6 +35,8 @@
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "stripe": "^20.1.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-react": "^5.31.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.2.1"
   },
