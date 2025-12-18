@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyAccessToken } from "./lib/auth";
-import { isAdmin } from "./lib/rbac";
 
 // Public routes that don't require authentication
 const publicRoutes = [
