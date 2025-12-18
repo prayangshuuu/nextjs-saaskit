@@ -202,14 +202,21 @@ export default function ModulesPage() {
                   </div>
                 </div>
               </CardHeader>
-              {warning && (
-                <CardContent>
-                  <Alert className={critical ? "border-yellow-200 bg-yellow-50" : ""}>
-                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                    <AlertDescription className={critical ? "text-yellow-800" : ""}>
-                      {warning}
-                    </AlertDescription>
-                  </Alert>
+              {(warning || getDependencyInfo(module).length > 0) && (
+                <CardContent className="space-y-2">
+                  {warning && (
+                    <Alert className={critical ? "border-yellow-200 bg-yellow-50" : ""}>
+                      <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                      <AlertDescription className={critical ? "text-yellow-800" : ""}>
+                        {warning}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {getDependencyInfo(module).length > 0 && (
+                    <div className="text-xs text-muted-foreground">
+                      <strong>Dependencies:</strong> Requires {getDependencyInfo(module).join(", ")} module(s) to be enabled
+                    </div>
+                  )}
                 </CardContent>
               )}
             </Card>
