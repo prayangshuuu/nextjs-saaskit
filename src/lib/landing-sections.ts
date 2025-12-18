@@ -65,14 +65,29 @@ export const LANDING_SECTIONS: LandingSection[] = [
 ];
 
 /**
- * Get enabled sections based on module state
+ * Get enabled sections based on module state and section-level controls
  */
 export async function getEnabledSections(): Promise<LandingSectionKey[]> {
-  const { isModuleEnabled } = await import("./module-service");
+  const { isModuleEnabled, getModule } = await import("./module-service");
+  
+  // Check if landing page module itself is enabled
+  const landingEnabled = await isModuleEnabled("landing");
+  if (!landingEnabled) {
+    return []; // If landing module is disabled, return no sections
+  }
+  
+  // Get landing module metadata for section-level control
+  const landingModule = await getModule("landing");
+  const sectionStates = landingModule?.metadata as Record<string, boolean> | undefined;
   
   const enabledSections: LandingSectionKey[] = [];
   
   for (const section of LANDING_SECTIONS) {
+    // Check section-level control (stored in metadata)
+    if (sectionStates && sectionStates[section.key] === false) {
+      continue; // Section explicitly disabled
+    }
+    
     // Check if section has module dependency
     if (section.moduleDependency) {
       const moduleEnabled = await isModuleEnabled(section.moduleDependency);
@@ -81,12 +96,7 @@ export async function getEnabledSections(): Promise<LandingSectionKey[]> {
       }
     }
     
-    // Check if landing page module itself is enabled
-    const landingEnabled = await isModuleEnabled("landing");
-    if (!landingEnabled) {
-      return []; // If landing module is disabled, return no sections
-    }
-    
+    // Section is enabled (either default or explicitly enabled)
     enabledSections.push(section.key);
   }
   
