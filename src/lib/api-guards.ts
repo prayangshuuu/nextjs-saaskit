@@ -109,11 +109,39 @@ export function apiHandler(
       const tenantId = getTenantFromRequest(request);
       setTenantContext(tenantId);
 
-      // Get user for audit logging
-      try {
+      // Check maintenance mode (bypass for admin)
+      const maintenanceEnabled = await isMaintenanceMode(tenantId);
+      if (maintenanceEnabled) {
+        // Get user to check if admin
         user = await getAuthenticatedUser(request);
-      } catch {
-        // User not authenticated, skip audit logging
+        if (user) {
+          const admin = await isAdmin(user.userId);
+          if (!admin) {
+            const message = await getMaintenanceMessage(tenantId);
+            setTenantContext(null);
+            return NextResponse.json(
+              { error: "Service temporarily unavailable", message },
+              { status: 503 }
+            );
+          }
+        } else {
+          // Not authenticated, return maintenance
+          const message = await getMaintenanceMessage(tenantId);
+          setTenantContext(null);
+          return NextResponse.json(
+            { error: "Service temporarily unavailable", message },
+            { status: 503 }
+          );
+        }
+      }
+
+      // Get user for audit logging
+      if (!user) {
+        try {
+          user = await getAuthenticatedUser(request);
+        } catch {
+          // User not authenticated, skip audit logging
+        }
       }
 
       response = await handler(request);
