@@ -367,6 +367,10 @@ Delete a subscription plan (Admin only). Cannot delete plans with active subscri
   - Read access to CRUD resources
   - Read access to Settings
 - Can update own profile
+- **Billing Features:**
+  - View available subscription plans
+  - Subscribe to plans
+  - View own subscription history
 - Cannot access admin routes
 
 ## 🔐 Environment Variables
