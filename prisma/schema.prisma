@@ -317,6 +317,7 @@ model Organization {
   invoices    Invoice[]
   apiKeys     ApiKey[]
   usageRecords UsageRecord[]
+  auditLogs   AuditLog[]
 
   @@index([ownerId])
   @@index([slug])
@@ -363,4 +364,28 @@ model UsageRecord {
   @@index([periodStart, periodEnd])
   @@unique([organizationId, metric, periodStart])
   @@map("usage_records")
+}
+
+// AuditLog model for compliance and security
+model AuditLog {
+  id             String   @id @default(cuid())
+  actorId        String   // User who performed the action
+  organizationId String?  // Organization context (if applicable)
+  action         String   // e.g., "user.created", "subscription.canceled"
+  entity         String   // e.g., "User", "Subscription", "Organization"
+  entityId       String?  // ID of the affected entity
+  metadata       Json?    // Additional context (IP, user agent, etc.)
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime @default(now())
+
+  // Relations
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([actorId])
+  @@index([organizationId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("audit_logs")
 }
