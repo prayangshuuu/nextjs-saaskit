@@ -323,6 +323,7 @@ model Organization {
   smtpConfig  SmtpConfig?
   emailTemplates EmailTemplate[]
   notifications Notification[]
+  systemSettings SystemSetting[]
 
   @@index([ownerId])
   @@index([slug])
@@ -481,4 +482,25 @@ model NotificationPreference {
 
   @@index([userId])
   @@map("notification_preferences")
+}
+
+// SystemSetting model for runtime configuration
+model SystemSetting {
+  id             String   @id @default(cuid())
+  key            String   // e.g., "app.name", "billing.enabled"
+  value          Json     // Setting value (type-safe based on type field)
+  type           String   // "string", "number", "boolean", "json"
+  isSecret       Boolean  @default(false) // Encrypted in application layer
+  organizationId String?  // null = global setting
+  description    String?  // Human-readable description
+  updatedAt      DateTime @updatedAt
+  updatedBy      String?  // User who last updated
+
+  // Relations
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, key]) // One setting per key per org
+  @@index([organizationId])
+  @@index([key])
+  @@map("system_settings")
 }
