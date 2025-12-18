@@ -27,7 +27,7 @@ export default function RegisterPage() {
         if (response.ok) {
           // User is logged in, redirect to checkout or dashboard
           if (planId) {
-            router.push(`/dashboard/plans?subscribe=${planId}`);
+            router.push(`/dashboard/subscriptions?subscribe=${planId}`);
           } else {
             router.push("/dashboard");
           }
@@ -63,7 +63,7 @@ export default function RegisterPage() {
 
       // Redirect to plan subscription if plan was preselected
       if (planId) {
-        router.push(`/dashboard/plans?subscribe=${planId}`);
+        router.push(`/dashboard/subscriptions?subscribe=${planId}`);
       } else {
         router.push("/dashboard");
       }

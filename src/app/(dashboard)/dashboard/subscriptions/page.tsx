@@ -32,6 +32,8 @@ export default function SubscriptionsPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPlans();
@@ -76,16 +78,24 @@ export default function SubscriptionsPage() {
     }
   };
 
-  const handleSubscribe = async (planId: string) => {
+  const handleSubscribeClick = (planId: string) => {
+    setSelectedPlanId(planId);
+    setConfirmDialogOpen(true);
+  };
+
+  const handleSubscribe = async () => {
+    if (!selectedPlanId) return;
+
     try {
       const response = await fetch("/api/v1/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId }),
+        body: JSON.stringify({ planId: selectedPlanId }),
       });
 
       if (response.ok) {
         const data = await response.json();
+        setConfirmDialogOpen(false);
         // Redirect to payment if needed
         if (data.paymentUrl) {
           window.location.href = data.paymentUrl;
@@ -180,7 +190,7 @@ export default function SubscriptionsPage() {
                     <Button
                       className="w-full mb-6"
                       variant={isRecommended ? "default" : "outline"}
-                      onClick={() => handleSubscribe(plan.id)}
+                      onClick={() => handleSubscribeClick(plan.id)}
                     >
                       {subscription ? "Change Plan" : "Subscribe"}
                     </Button>
