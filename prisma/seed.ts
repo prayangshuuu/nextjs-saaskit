@@ -199,6 +199,80 @@ async function main() {
   }
 
   console.log("✅ Payment providers created");
+
+  // Create default email templates
+  console.log("Creating email templates...");
+  const defaultTemplates = [
+    {
+      key: "welcome",
+      subject: "Welcome to {{app.name}}!",
+      htmlBody: `
+        <h1>Welcome to {{app.name}}!</h1>
+        <p>Hi {{user.name}},</p>
+        <p>Thank you for signing up! We're excited to have you on board.</p>
+        <p>Get started by verifying your email address.</p>
+        <p><a href="{{verificationLink}}">Verify Email</a></p>
+      `,
+      textBody: `Welcome to {{app.name}}!\n\nHi {{user.name}},\n\nThank you for signing up! We're excited to have you on board.\n\nGet started by verifying your email address: {{verificationLink}}`,
+    },
+    {
+      key: "reset-password",
+      subject: "Reset your password",
+      htmlBody: `
+        <h1>Reset Your Password</h1>
+        <p>Hi {{user.name}},</p>
+        <p>You requested to reset your password. Click the link below to reset it:</p>
+        <p><a href="{{resetLink}}">Reset Password</a></p>
+        <p>This link will expire in 1 hour.</p>
+        <p>If you didn't request this, please ignore this email.</p>
+      `,
+      textBody: `Reset Your Password\n\nHi {{user.name}},\n\nYou requested to reset your password. Click the link below to reset it:\n{{resetLink}}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.`,
+    },
+    {
+      key: "invoice-paid",
+      subject: "Invoice Paid - {{invoice.amount}}",
+      htmlBody: `
+        <h1>Invoice Paid</h1>
+        <p>Hi {{user.name}},</p>
+        <p>Your invoice #{{invoice.id}} for {{invoice.amount}} {{invoice.currency}} has been paid successfully.</p>
+        <p>Thank you for your payment!</p>
+      `,
+      textBody: `Invoice Paid\n\nHi {{user.name}},\n\nYour invoice #{{invoice.id}} for {{invoice.amount}} {{invoice.currency}} has been paid successfully.\n\nThank you for your payment!`,
+    },
+    {
+      key: "subscription-activated",
+      subject: "Subscription Activated",
+      htmlBody: `
+        <h1>Subscription Activated</h1>
+        <p>Hi {{user.name}},</p>
+        <p>Your subscription to {{plan.name}} has been activated!</p>
+        <p>You now have access to all features included in your plan.</p>
+      `,
+      textBody: `Subscription Activated\n\nHi {{user.name}},\n\nYour subscription to {{plan.name}} has been activated!\n\nYou now have access to all features included in your plan.`,
+    },
+  ];
+
+  for (const template of defaultTemplates) {
+    await prisma.emailTemplate.upsert({
+      where: {
+        organizationId_key: {
+          organizationId: null,
+          key: template.key,
+        },
+      },
+      update: {},
+      create: {
+        key: template.key,
+        subject: template.subject,
+        htmlBody: template.htmlBody.trim(),
+        textBody: template.textBody.trim(),
+        enabled: true,
+        organizationId: null, // Global templates
+      },
+    });
+  }
+  console.log("✅ Email templates created");
+
   console.log("\n📋 Seed Summary:");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("Admin User:");
