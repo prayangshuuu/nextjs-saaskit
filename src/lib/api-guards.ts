@@ -59,11 +59,11 @@ export async function requirePermission(
   }
 }
 
-// API error handler wrapper with tenant context
+// API error handler wrapper with tenant context and usage tracking
 export function apiHandler(
   handler: (request: NextRequest) => Promise<NextResponse>
 ) {
-  return async (request: NextRequest): Promise<NextResponse> => {
+  return withUsageTracking(async (request: NextRequest): Promise<NextResponse> => {
     try {
       // Set tenant context from request
       const tenantId = getTenantFromRequest(request);
@@ -96,6 +96,6 @@ export function apiHandler(
         { status: 500 }
       );
     }
-  };
+  });
 }
 

@@ -315,6 +315,7 @@ model Organization {
   subscriptions Subscription[]
   invoices    Invoice[]
   apiKeys     ApiKey[]
+  usageRecords UsageRecord[]
 
   @@index([ownerId])
   @@index([slug])
@@ -340,4 +341,25 @@ model OrganizationMember {
   @@index([organizationId])
   @@index([userId])
   @@map("organization_members")
+}
+
+// UsageRecord model for tracking usage metrics
+model UsageRecord {
+  id             String   @id @default(cuid())
+  organizationId String
+  metric         String   // e.g., "api_requests", "active_users", "feature_usage"
+  value          Decimal  @db.Decimal(10, 2)
+  metadata       Json?    // Additional context (endpoint, feature name, etc.)
+  periodStart    DateTime // Billing period start
+  periodEnd      DateTime // Billing period end
+  createdAt      DateTime @default(now())
+
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([metric])
+  @@index([periodStart, periodEnd])
+  @@unique([organizationId, metric, periodStart])
+  @@map("usage_records")
 }
