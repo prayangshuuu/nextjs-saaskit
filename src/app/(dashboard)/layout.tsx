@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/components/theme-provider";
+import { BrandingProvider } from "@/components/branding-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OrganizationSwitcher } from "@/components/organization-switcher";
 import Link from "next/link";
@@ -13,6 +14,7 @@ export default function DashboardLayout({
 }) {
   return (
     <ThemeProvider>
+      <BrandingProvider>
       <div className="min-h-screen bg-background">
         <nav className="border-b">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -86,6 +88,7 @@ export default function DashboardLayout({
         </nav>
         <main className="container mx-auto px-4 py-8">{children}</main>
       </div>
+      </BrandingProvider>
     </ThemeProvider>
   );
 }
