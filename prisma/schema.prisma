@@ -38,6 +38,7 @@ model User {
   notificationPreference NotificationPreference?
   twoFactorRecoveryCodes TwoFactorRecoveryCode[]
   oauthAccounts OAuthAccount[]
+  fileUploads FileUpload[]
 
   @@map("users")
 }
@@ -190,6 +191,31 @@ model OAuthAccount {
   @@index([userId])
   @@index([provider])
   @@map("oauth_accounts")
+}
+
+// File Upload model
+model FileUpload {
+  id            String   @id @default(cuid())
+  userId        String
+  organizationId String?
+  filename      String
+  originalName  String
+  mimeType      String
+  size          Int      // Size in bytes
+  storagePath   String   // Path to file (local or S3 key)
+  storageType   String   @default("local") // "local" or "s3"
+  purpose       String   // "avatar", "logo", "document", etc.
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization  Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([purpose])
+  @@map("file_uploads")
 }
 
 // Enums
