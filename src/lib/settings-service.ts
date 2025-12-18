@@ -1,3 +1,10 @@
+/**
+ * Settings Service
+ * 
+ * MIT License
+ * Copyright (c) 2025 Prayangshu Biswas
+ */
+
 import { prisma } from "./prisma";
 
 // Simple in-memory cache (in production, use Redis)
@@ -196,4 +203,3 @@ export async function setSetting(
 export function clearSettingsCache(): void {
   settingsCache.clear();
 }
-

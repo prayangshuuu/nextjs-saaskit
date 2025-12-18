@@ -1,3 +1,10 @@
+/**
+ * Branding Service
+ * 
+ * MIT License
+ * Copyright (c) 2025 Prayangshu Biswas
+ */
+
 import { getStringSetting, getBooleanSetting } from "./settings-service";
 import { getTenantFromRequest } from "./tenant";
 import { NextRequest } from "next/server";
@@ -46,4 +53,3 @@ export function generateBrandingCSS(config: BrandingConfig): string {
     }
   `;
 }
-
