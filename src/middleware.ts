@@ -10,6 +10,8 @@ const publicRoutes = [
   "/api/v1/auth/verify-email",
   "/api/v1/auth/reset-password",
   "/api/v1/auth/forgot-password",
+  "/api/v1/plans",
+  "/api/v1/webhooks",
 ];
 
 // Admin-only API routes
