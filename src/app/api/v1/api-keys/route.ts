@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAuth, apiHandler } from "@/lib/api-guards";
+import { requireAuth, apiHandler } from "@/lib/api-guards-with-rate-limit";
 import { generateApiKey, hashApiKey } from "@/lib/api-keys";
+import { checkRateLimit, getRateLimitIdentifier } from "@/lib/rate-limit";
+import { verifyApiKey } from "@/lib/api-keys";
 
 const createApiKeySchema = z.object({
   name: z.string().min(1),
@@ -12,6 +14,23 @@ const createApiKeySchema = z.object({
 });
 
 export const POST = apiHandler(async (request: NextRequest) => {
+  // Check rate limiting for API key requests
+  const identifier = getRateLimitIdentifier(request);
+  const limitCheck = checkRateLimit(identifier, 10); // 10 requests per minute for API key creation
+  if (!limitCheck.allowed) {
+    return NextResponse.json(
+      { error: "Rate limit exceeded" },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": "10",
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": limitCheck.resetAt.toString(),
+        },
+      }
+    );
+  }
+
   const user = await requireAuth(request);
   const body = await request.json();
   const data = createApiKeySchema.parse(body);
