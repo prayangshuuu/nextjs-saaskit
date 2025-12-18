@@ -26,6 +26,45 @@ const protectedRoutes = ["/dashboard", "/api/v1"];
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Check for API key authentication
+  const apiKey = request.headers.get("x-api-key");
+  if (apiKey && pathname.startsWith("/api/v1")) {
+    const keyInfo = await verifyApiKey(apiKey);
+    if (keyInfo.valid && keyInfo.userId) {
+      // Apply rate limiting for API keys
+      const identifier = getRateLimitIdentifier(request);
+      const rateLimit = keyInfo.rateLimit || 100;
+      const limitCheck = checkRateLimit(identifier, rateLimit);
+
+      if (!limitCheck.allowed) {
+        return NextResponse.json(
+          {
+            error: "Rate limit exceeded",
+            resetAt: new Date(limitCheck.resetAt).toISOString(),
+          },
+          {
+            status: 429,
+            headers: {
+              "X-RateLimit-Limit": rateLimit.toString(),
+              "X-RateLimit-Remaining": "0",
+              "X-RateLimit-Reset": limitCheck.resetAt.toString(),
+            },
+          }
+        );
+      }
+
+      // Add rate limit headers
+      const response = NextResponse.next();
+      response.headers.set("X-RateLimit-Limit", rateLimit.toString());
+      response.headers.set(
+        "X-RateLimit-Remaining",
+        limitCheck.remaining.toString()
+      );
+      response.headers.set("X-RateLimit-Reset", limitCheck.resetAt.toString());
+      return response;
+    }
+  }
+
   // Allow public routes
   if (publicRoutes.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();

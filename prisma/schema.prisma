@@ -29,6 +29,7 @@ model User {
   passwordResetTokens PasswordResetToken[]
   subscriptions Subscription[]
   invoices      Invoice[]
+  apiKeys       ApiKey[]
 
   @@map("users")
 }
@@ -256,4 +257,27 @@ model PaymentProvider {
   updatedAt   DateTime            @updatedAt
 
   @@map("payment_providers")
+}
+
+// API Key model
+model ApiKey {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  key         String   @unique
+  keyHash     String   // Hashed version for verification
+  scopes      String[] // Array of permission scopes
+  rateLimit   Int      @default(100) // Requests per minute
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  revoked     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([key])
+  @@map("api_keys")
 }
