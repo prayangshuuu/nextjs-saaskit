@@ -48,6 +48,13 @@ export default function DashboardLayout({
                   <Wallet className="h-4 w-4" />
                 </Link>
                 <Link
+                  href="/dashboard/usage"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  title="Usage"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                </Link>
+                <Link
                   href="/dashboard/settings"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground"
                   title="Settings"
