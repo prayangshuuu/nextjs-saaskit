@@ -140,6 +140,7 @@ async function main() {
     { key: "admin", enabled: true, description: "Admin dashboard", scope: "ADMIN" },
     { key: "file_uploads", enabled: true, description: "File upload system", scope: "AUTH" },
     { key: "notifications", enabled: true, description: "Notification system", scope: "AUTH" },
+    { key: "coming_soon", enabled: false, description: "Coming soon mode (overrides public pages)", scope: "GLOBAL" },
   ];
 
   for (const module of defaultModules) {
