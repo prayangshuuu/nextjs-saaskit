@@ -147,6 +147,122 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">
+          Trusted by Developers
+        </h2>
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-muted-foreground mb-4">
+                "This starter kit saved us weeks of development time. Everything we needed was already there."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                  JD
+                </div>
+                <div>
+                  <p className="font-semibold">John Doe</p>
+                  <p className="text-sm text-muted-foreground">CTO, TechStart</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-muted-foreground mb-4">
+                "The multi-tenancy support is excellent. We launched our SaaS in record time."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                  JS
+                </div>
+                <div>
+                  <p className="font-semibold">Jane Smith</p>
+                  <p className="text-sm text-muted-foreground">Founder, CloudApp</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-muted-foreground mb-4">
+                "Production-ready from day one. The billing integration made our launch seamless."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                  MB
+                </div>
+                <div>
+                  <p className="font-semibold">Mike Brown</p>
+                  <p className="text-sm text-muted-foreground">Lead Developer, SaaSPro</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Trust Badges */}
+      <section className="bg-muted py-12">
+        <div className="container mx-auto px-4">
+          <p className="text-center text-sm text-muted-foreground mb-6">
+            Trusted by teams worldwide
+          </p>
+          <div className="flex flex-wrap justify-center gap-8 items-center opacity-60">
+            <div className="text-2xl font-bold">SOC 2</div>
+            <div className="text-2xl font-bold">GDPR</div>
+            <div className="text-2xl font-bold">99.9% Uptime</div>
+            <div className="text-2xl font-bold">ISO 27001</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Feature Comparison */}
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">
+          Compare Plans
+        </h2>
+        <div className="max-w-4xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle>All Plans Include</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span>Multi-tenant support</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span>Usage tracking</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span>White-label branding</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span>API access</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span>Email notifications</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span>Audit logs</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="bg-primary text-primary-foreground py-16">
         <div className="container mx-auto px-4 text-center">
@@ -156,12 +272,19 @@ export default function HomePage() {
           <p className="text-lg mb-8 opacity-90">
             Join thousands of developers building SaaS products faster.
           </p>
-          <Button asChild size="lg" variant="secondary">
-            <Link href="/pricing">
-              View Pricing
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+          <div className="flex gap-4 justify-center">
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/pricing">
+                View Pricing
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="bg-transparent border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10">
+              <Link href="/register">
+                Start Free Trial
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
     </div>

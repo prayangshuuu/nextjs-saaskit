@@ -593,6 +593,27 @@ nextjs-saaskit/
 └── README.md
 ```
 
+## 🌐 Marketing & Landing Pages
+
+### Landing Page (`/`)
+- Hero section with value proposition
+- Feature highlights grid
+- How it works section
+- Screenshots placeholders
+- Testimonials section
+- Trust badges
+- Feature comparison
+- Multiple CTAs (pricing, free trial)
+- Dark/light mode support
+- SEO-optimized structure
+
+**Conversion Focus:**
+- Clear value proposition
+- Social proof (testimonials)
+- Trust indicators
+- Multiple conversion points
+- Pricing anchor links
+
 ## 🔮 Upcoming Features Roadmap
 
 - [x] **Payment Integration**
