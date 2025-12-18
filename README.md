@@ -501,6 +501,25 @@ SMTP_FROM=""
 
 ### Production Deployment
 
+#### Option 1: Docker (Recommended)
+
+1. **Start with Docker Compose**
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Run migrations**
+   ```bash
+   docker-compose exec app npx prisma migrate deploy
+   ```
+
+3. **Seed database (optional)**
+   ```bash
+   docker-compose exec app npm run db:seed
+   ```
+
+#### Option 2: Manual Deployment
+
 1. **Build the application**
    ```bash
    npm run build
@@ -515,6 +534,21 @@ SMTP_FROM=""
    ```bash
    npm start
    ```
+
+### Docker Development
+
+For local development with Docker:
+
+```bash
+# Start PostgreSQL only
+docker-compose -f docker-compose.dev.yml up -d
+
+# Run migrations
+npm run db:migrate
+
+# Start dev server
+npm run dev
+```
 
 ### Database Migrations
 
