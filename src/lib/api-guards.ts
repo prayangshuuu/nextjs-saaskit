@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken } from "./jwt";
 import { hasPermission, isAdmin, PermissionResource, PermissionAction } from "./rbac";
+import { getTenantFromRequest, setTenantContext } from "./tenant";
 
 export interface AuthenticatedRequest extends NextRequest {
   user?: {
@@ -58,14 +59,26 @@ export async function requirePermission(
   }
 }
 
-// API error handler wrapper
+// API error handler wrapper with tenant context
 export function apiHandler(
   handler: (request: NextRequest) => Promise<NextResponse>
 ) {
   return async (request: NextRequest): Promise<NextResponse> => {
     try {
-      return await handler(request);
+      // Set tenant context from request
+      const tenantId = getTenantFromRequest(request);
+      setTenantContext(tenantId);
+
+      const response = await handler(request);
+
+      // Clear tenant context after request
+      setTenantContext(null);
+
+      return response;
     } catch (error) {
+      // Clear tenant context on error
+      setTenantContext(null);
+
       if (error instanceof Error) {
         if (error.message === "Unauthorized") {
           return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
