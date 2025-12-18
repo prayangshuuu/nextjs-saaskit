@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,36 @@ import { Label } from "@/components/ui/label";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const planId = searchParams.get("plan");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/v1/auth/me");
+        if (response.ok) {
+          // User is logged in, redirect to checkout or dashboard
+          if (planId) {
+            router.push(`/dashboard/plans?subscribe=${planId}`);
+          } else {
+            router.push("/dashboard");
+          }
+        }
+      } catch {
+        // Not authenticated, continue with registration
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, [planId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +61,12 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push("/dashboard");
+      // Redirect to plan subscription if plan was preselected
+      if (planId) {
+        router.push(`/dashboard/plans?subscribe=${planId}`);
+      } else {
+        router.push("/dashboard");
+      }
       router.refresh();
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -44,11 +74,23 @@ export default function RegisterPage() {
     }
   };
 
+  if (checkingAuth) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardContent className="py-8 text-center">
+          <p className="text-muted-foreground">Loading...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>Create Account</CardTitle>
-        <CardDescription>Sign up to get started</CardDescription>
+        <CardDescription>
+          {planId ? "Sign up to subscribe to your selected plan" : "Sign up to get started"}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -36,9 +36,9 @@ export default function DashboardLayout({
                   <Users className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/dashboard/plans"
+                  href="/dashboard/subscriptions"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground"
-                  title="Plans"
+                  title="Subscriptions"
                 >
                   <CreditCard className="h-4 w-4" />
                 </Link>

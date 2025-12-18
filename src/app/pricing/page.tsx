@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { PricingButton } from "@/components/pricing-button";
 
 export const metadata: Metadata = {
   title: "Pricing",
