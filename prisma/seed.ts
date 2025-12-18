@@ -204,6 +204,19 @@ async function main() {
   console.log("Creating email templates...");
   const defaultTemplates = [
     {
+      key: "email-verification",
+      subject: "Verify your email address",
+      htmlBody: `
+        <h1>Verify Your Email Address</h1>
+        <p>Hi {{user.name}},</p>
+        <p>Thank you for signing up for {{app.name}}! Please verify your email address by clicking the link below:</p>
+        <p><a href="{{verificationLink}}">Verify Email Address</a></p>
+        <p>This link will expire in 24 hours.</p>
+        <p>If you didn't create an account, please ignore this email.</p>
+      `,
+      textBody: `Verify Your Email Address\n\nHi {{user.name}},\n\nThank you for signing up for {{app.name}}! Please verify your email address by clicking the link below:\n{{verificationLink}}\n\nThis link will expire in 24 hours.\n\nIf you didn't create an account, please ignore this email.`,
+    },
+    {
       key: "welcome",
       subject: "Welcome to {{app.name}}!",
       htmlBody: `
