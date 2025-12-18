@@ -318,6 +318,7 @@ model Organization {
   apiKeys     ApiKey[]
   usageRecords UsageRecord[]
   auditLogs   AuditLog[]
+  smtpConfig  SmtpConfig?
 
   @@index([ownerId])
   @@index([slug])
@@ -388,4 +389,28 @@ model AuditLog {
   @@index([entity])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// SmtpConfig model for email configuration
+model SmtpConfig {
+  id             String   @id @default(cuid())
+  organizationId String?  // null = global fallback
+  host           String
+  port           Int      @default(587)
+  username       String
+  password       String   // Encrypted in application layer
+  fromName       String
+  fromEmail      String
+  secure         Boolean  @default(false) // true for port 465
+  enabled        Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId]) // One config per org (null for global)
+  @@index([organizationId])
+  @@index([enabled])
+  @@map("smtp_configs")
 }
