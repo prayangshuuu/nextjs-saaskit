@@ -691,6 +691,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
 - **Community First**: Community contributions are welcome and valued
 - **Maintainer-Led**: Project direction guided by maintainer with community input
 
+## 🎯 Project Vision
+
+nextjs-saaskit aims to be the go-to open-source SaaS starter kit for developers who want to:
+
+- **Launch Faster**: Skip the repetitive setup work and focus on your unique value
+- **Build Confidently**: Use production-ready, battle-tested patterns and practices
+- **Scale Easily**: Built with scalability and multi-tenancy in mind from day one
+- **Stay Free**: No vendor lock-in, no hidden costs, no restrictions
+
+We believe that great tools should be accessible to everyone, and that's why this project is 100% free and open source.
+
 ## 🔒 Security
 
 ### Security Features
