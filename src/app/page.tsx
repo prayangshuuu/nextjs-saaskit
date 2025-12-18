@@ -302,6 +302,15 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Open Source Notice */}
+      <section className="container mx-auto px-4 py-12 text-center">
+        <p className="text-muted-foreground">
+          <Link href="/open-source" className="hover:underline">
+            Learn more about our open-source philosophy
+          </Link>
+        </p>
+      </section>
     </div>
   );
 }
