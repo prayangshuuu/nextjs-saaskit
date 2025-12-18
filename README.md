@@ -646,7 +646,16 @@ nextjs-saaskit/
 
 ## 📝 License
 
-This project is private and proprietary.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### Commercial Licensing
+
+This software is open source and free to use for any purpose, including commercial use. We also offer commercial services including paid support, private builds, and hosted SaaS options. See [COMMERCIAL.md](COMMERCIAL.md) for details.
+
+**Open Source Commitment:**
+- The open-source version will always remain free
+- No features are restricted in the OSS version
+- Commercial services are optional and do not restrict usage
 
 ## 🤝 Contributing
 
