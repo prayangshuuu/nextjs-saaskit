@@ -3,9 +3,12 @@ import { requireAdmin, apiHandler } from "@/lib/api-guards";
 import { prisma } from "@/lib/prisma";
 import { getSmtpConfig, testSmtpConnection } from "@/lib/smtp";
 import { isMaintenanceMode } from "@/lib/maintenance";
+import { getStringSetting } from "@/lib/settings-service";
 
 export const GET = apiHandler(async (request: NextRequest) => {
   await requireAdmin(request);
+
+  const appVersion = await getStringSetting("app.version", process.env.npm_package_version || "0.1.0", null);
 
   const health: {
     app: {
@@ -33,7 +36,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
     };
   } = {
     app: {
-      version: process.env.npm_package_version || "0.1.0",
+      version: appVersion,
       environment: process.env.NODE_ENV || "development",
       nodeVersion: process.version,
     },
